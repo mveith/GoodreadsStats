@@ -11,4 +11,4 @@ if [ $exit_code -ne 0 ]; then
     exit $exit_code
 fi
 
-mono --runtime=v4.0 packages/FAKE/tools/FAKE.exe build.fsx -d:MONO $1
+mono --runtime=v4.0 packages/FAKE/tools/FAKE.exe build.fsx -d:MONO key=%1 secret=%2

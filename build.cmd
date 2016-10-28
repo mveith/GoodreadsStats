@@ -12,4 +12,4 @@ if errorlevel 1 (
   exit /b %errorlevel%
 )
 
-packages\FAKE\tools\FAKE.exe build.fsx %1
+packages\FAKE\tools\FAKE.exe build.fsx key=%1 secret=%2
