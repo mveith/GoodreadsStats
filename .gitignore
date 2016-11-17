@@ -252,3 +252,4 @@ paket-files/
 *.sln.iml
 
 build/app
+GoodreadsStats.Client/scripts/

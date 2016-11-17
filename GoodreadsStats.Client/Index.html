@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Goodreads Prototype</title>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="js.cookie.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="centeredContainer">
+            <h1>Convert web to EPUB</h1>
+            <div id="content"></div>
+            <div>
+                <button id="loginButton" value="Přihlásit">Přihlásit</button>
+            </div>
+        </div>
+    </div>
+    <script src="node_modules/core-js/client/core.min.js"></script>
+    <script src="node_modules/requirejs/require.js"></script>
+    <script>
+        requirejs.config({
+            baseUrl: 'scripts',
+            paths: {
+                'react': '../node_modules/react/dist/react.min',
+                'react-dom': '../node_modules/react-dom/dist/react-dom.min',
+                'fable-core': '../node_modules/fable-core/fable-core.min',
+            }
+        });
+        requirejs(["scripts"]);
+    </script>
+</body>
+</html>
