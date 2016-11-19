@@ -2,15 +2,15 @@
 #load "Fable.Import.Global.fsx"
 #load "node_modules/fable-import-react/Fable.Import.React.fs"
 #load "node_modules/fable-import-react/Fable.Helpers.React.fs"
+#load "Utils.fsx"
 #load "Components.fsx"
 
 open Fable.Import
-open Fable.Import.Browser
 open Fable.Import.Global
+open Components
+open Utils
 
 module R = Fable.Helpers.React
-
-open Components
 
 let parseTokenAndSecret (result : string) = 
     let parts = result.Split([| "|" |], System.StringSplitOptions.RemoveEmptyEntries)
@@ -26,26 +26,10 @@ let saveAndReturnAuthorizationUrl result =
     setCookie "authorizationTokenSecret" secret 1
     url
 
-let navigateTo url = window.location.href <- url
-
 let login() = 
-    ajax """http://localhost:8083/authorizationUrl""" (string
-                              >> saveAndReturnAuthorizationUrl
-                              >> navigateTo)
-
-let getQueryVariable variable = 
-    let query = window.location.search.Substring 1
-    let vars = query.Split '&'
-    
-    let var = 
-        vars
-        |> Seq.map ((fun var -> var.Split '=')
-                    >> Seq.map decodeURIComponent
-                    >> (fun parts -> (Seq.item 0 parts, Seq.item 1 parts)))
-        |> Seq.filter (fun (key, _) -> key = variable)
-        |> Seq.map (fun (_, value) -> value)
-        |> Seq.tryHead
-    var
+    ajax (completeUrl "authorizationUrl") (string
+                                           >> saveAndReturnAuthorizationUrl
+                                           >> navigateTo)
 
 let getAccessToken() = 
     let token = Globals.cookies.get ("accessToken")
@@ -58,33 +42,34 @@ let saveAccessToken (accessToken, accessTokenSecret) =
     let accessToken = string accessToken
     setCookie "accessToken" accessToken 7
     setCookie "accessTokenSecret" accessTokenSecret 7
+    (accessToken, accessTokenSecret)
 
-let tryAuthorize (onSuccess : (string * string) option -> unit) = 
+let tryAuthorize onSuccess = 
     let token = getQueryVariable "oauth_token"
     let secret = Globals.cookies.get ("authorizationTokenSecret")
     match token with
     | Some token -> 
-        let url = sprintf """http://localhost:8083/authorized?token=%s&tokenSecret=%s""" token secret.Value
+        let url = completeUrlWithToken "authorized" token secret.Value
         ajax url (string
                   >> parseTokenAndSecret
                   >> saveAccessToken
-                  >> getAccessToken
                   >> onSuccess)
     | None -> ()
 
-let start accessToken accessTokenSecret = 
-    ReactDom.render (R.com<BooksList, _, _> { accessToken = accessToken; accessTokenSecret  = accessTokenSecret  } [], Browser.document.getElementById "content") 
-    |> ignore
+let showBookList (accessToken, accessTokenSecret) = 
+    let props = 
+        { accessToken = accessToken
+          accessTokenSecret = accessTokenSecret }
+    
+    let rootElement = Browser.document.getElementById "content"
+    let reactComponent = R.com<BooksList, _, _> props []
+    ReactDom.render (reactComponent, rootElement) |> ignore
 
 let onPageLoad() = 
     let accessToken = getAccessToken()
     match accessToken with
-    | Some(accessToken, accessTokenSecret) -> start accessToken accessTokenSecret
-    | None -> 
-        let start (tokenPair : (string * string) option) = 
-            let (token, secret) = tokenPair.Value
-            start token secret
-        tryAuthorize start
+    | Some(accessToken, accessTokenSecret) -> showBookList (accessToken, accessTokenSecret)
+    | None -> tryAuthorize showBookList
 
 Globals.jQuery.Invoke("#loginButton").click(fun _ -> login())
 onPageLoad()

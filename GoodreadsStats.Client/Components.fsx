@@ -2,12 +2,13 @@
 #load "Fable.Import.Global.fsx"
 #load "node_modules/fable-import-react/Fable.Import.React.fs"
 #load "node_modules/fable-import-react/Fable.Helpers.React.fs"
-
-open Fable.Import
-open Fable.Import.Global
+#load "Utils.fsx"
 
 module R = Fable.Helpers.React
 
+open Fable.Import
+open Fable.Import.Global
+open Utils
 open R.Props
 
 type ReadBook = 
@@ -28,7 +29,7 @@ type BooksList(props) as this =
         >> saveBooks
     
     member x.componentDidMount() = 
-        let url = sprintf """http://localhost:8083/readed?token=%s&tokenSecret=%s""" props.accessToken props.accessTokenSecret
+        let url = completeUrlWithToken "readed" props.accessToken props.accessTokenSecret
         ajax url updateState |> ignore
     
     member x.render() = 
