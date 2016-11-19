@@ -56,7 +56,6 @@ let getAccessToken() =
 
 let saveAccessToken (accessToken, accessTokenSecret) = 
     let accessToken = string accessToken
-    window.alert "cookie získána"
     setCookie "accessToken" accessToken 7
     setCookie "accessTokenSecret" accessTokenSecret 7
 
@@ -65,7 +64,7 @@ let tryAuthorize (onSuccess : (string * string) option -> unit) =
     let secret = Globals.cookies.get ("authorizationTokenSecret")
     match token with
     | Some token -> 
-        let url = sprintf """http://localhost:8083/authorized?oauth_token=%s&oauth_token_secret=%s""" token secret.Value
+        let url = sprintf """http://localhost:8083/authorized?token=%s&tokenSecret=%s""" token secret.Value
         ajax url (string
                   >> parseTokenAndSecret
                   >> saveAccessToken

@@ -253,3 +253,4 @@ paket-files/
 
 build/app
 GoodreadsStats.Client/scripts/
+.vscode/tasks.json
