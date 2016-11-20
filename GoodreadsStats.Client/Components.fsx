@@ -2,6 +2,7 @@
 #load "Fable.Import.Global.fsx"
 #load "node_modules/fable-import-react/Fable.Import.React.fs"
 #load "node_modules/fable-import-react/Fable.Helpers.React.fs"
+#load "../GoodreadsStats.Model/Model.fs"
 #load "Utils.fsx"
 
 module R = Fable.Helpers.React
@@ -10,10 +11,7 @@ open Fable.Import
 open Fable.Import.Global
 open Utils
 open R.Props
-
-type ReadBook = 
-    { Title : string
-      Author : string }
+open GoodreadsStats.Model
 
 let bookItem (book : ReadBook) = R.div [] [ unbox book.Title ]
 

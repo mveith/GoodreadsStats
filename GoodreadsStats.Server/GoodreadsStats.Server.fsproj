@@ -77,6 +77,11 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <ProjectReference Include="..\GoodreadsStats.Model\GoodreadsStats.Model.fsproj">
+      <Name>GoodreadsStats.Model</Name>
+      <Project>{f759bca9-9f6c-431b-986b-524160306fef}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\OAuth\OAuth.fsproj">
       <Name>OAuth</Name>
       <Project>{7a00d019-56fd-4c37-a521-7cbf7ad56397}</Project>

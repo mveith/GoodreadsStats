@@ -5,10 +5,7 @@ open Suave.Filters
 open Suave.Operators
 open Suave.Successful
 open FSharp.Configuration
-
-type ReadBook = 
-    { Title : string
-      Author : string }
+open GoodreadsStats.Model
 
 type Settings = AppSettings< "app.config" >
 
