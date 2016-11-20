@@ -3,6 +3,8 @@
 open Suave
 open Suave.Operators
 open Suave.Writers
+open Suave.Successful
+open Newtonsoft.Json
 
 let toOption choice = 
     match choice with
@@ -25,3 +27,4 @@ let processRequestWithTokenParams f (request : HttpRequest) =
 let setCORSHeaders acceptedUrl = 
     setHeader "Access-Control-Allow-Origin" acceptedUrl >=> setHeader "Access-Control-Allow-Headers" "content-type"
 
+let json a = OK(JsonConvert.SerializeObject a)

@@ -4,14 +4,10 @@ open Suave
 open Suave.Filters
 open Suave.Operators
 open Suave.Successful
-open System.Runtime.Serialization
 open FSharp.Configuration
 
-[<DataContract>]
 type ReadBook = 
-    { [<field:DataMember(Name = "Title")>]
-      Title : string
-      [<field:DataMember(Name = "Author")>]
+    { Title : string
       Author : string }
 
 type Settings = AppSettings< "app.config" >
@@ -38,7 +34,7 @@ let readBooks token tokenSecret =
         reviews
         |> Seq.map createBook
         |> Seq.toArray
-    ok (Suave.Json.toJson books)
+    json books
 
 let setCORSHeaders = setCORSHeaders clientSideUrl
 let requestWithTokenParams f = request (processRequestWithTokenParams f)
