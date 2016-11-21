@@ -56,20 +56,20 @@ let tryAuthorize onSuccess =
                   >> onSuccess)
     | None -> ()
 
-let showBookList (accessToken, accessTokenSecret) = 
+let showBasicStats (accessToken, accessTokenSecret) = 
     let props = 
         { accessToken = accessToken
           accessTokenSecret = accessTokenSecret }
     
     let rootElement = Browser.document.getElementById "content"
-    let reactComponent = R.com<BooksList, _, _> props []
+    let reactComponent = R.com<BasicStatsTable, _, _> props []
     ReactDom.render (reactComponent, rootElement) |> ignore
 
 let onPageLoad() = 
     let accessToken = getAccessToken()
     match accessToken with
-    | Some(accessToken, accessTokenSecret) -> showBookList (accessToken, accessTokenSecret)
-    | None -> tryAuthorize showBookList
+    | Some(accessToken, accessTokenSecret) -> showBasicStats (accessToken, accessTokenSecret)
+    | None -> tryAuthorize showBasicStats
 
 Globals.jQuery.Invoke("#loginButton").click(fun _ -> login())
 onPageLoad()

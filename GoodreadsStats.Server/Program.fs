@@ -5,7 +5,7 @@ open Suave.Filters
 open Suave.Operators
 open Suave.Successful
 open FSharp.Configuration
-open GoodreadsStats.Model
+open BasicStatsCalculator
 
 type Settings = AppSettings< "app.config" >
 
@@ -18,20 +18,9 @@ let authorized token tokenSecret =
     let result = sprintf "%s|%s" token tokenSecret
     OK result
 
-let createBook (review : Reviews.Review) = 
-    { Title = review.Book.Title
-      Author = review.Book.Author.Name }
-
-let readBooks token tokenSecret = 
+let basicStats token tokenSecret = 
     let accessData = getAccessData clientKey clientSecret token tokenSecret
-    let userId = getUserId accessData
-    let reviews = getAllReviews accessData userId "read" "date_read"
-    
-    let books = 
-        reviews
-        |> Seq.map createBook
-        |> Seq.toArray
-    json books
+    json (basicStats accessData)
 
 let setCORSHeaders = setCORSHeaders clientSideUrl
 let requestWithTokenParams f = request (processRequestWithTokenParams f)
@@ -43,6 +32,6 @@ let authorizationUrlRequest request =
 let webPart = 
     choose [ GET >=> choose [ path "/authorizationUrl" >=> setCORSHeaders >=> request authorizationUrlRequest
                               pathStarts "/authorized" >=> setCORSHeaders >=> requestWithTokenParams authorized
-                              pathStarts "/readed" >=> setCORSHeaders >=> requestWithTokenParams readBooks ] ]
+                              pathStarts "/basicStats" >=> setCORSHeaders >=> requestWithTokenParams basicStats ] ]
 
 startWebServer defaultConfig webPart

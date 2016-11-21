@@ -52,3 +52,9 @@ let getAllReviews accessData userId shelf sort =
         |> Seq.map getReviewsOnPage
         |> Seq.collect (fun pageReviews -> pageReviews.Reviews)
     Seq.concat [| first; others |]
+
+let goodreadsDataFormat = "ddd MMM dd HH:mm:ss zzz yyyy"
+
+let parseDate s = 
+    System.DateTime.ParseExact(s, goodreadsDataFormat, System.Globalization.CultureInfo.InvariantCulture)
+    
