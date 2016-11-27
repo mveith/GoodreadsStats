@@ -18,12 +18,15 @@ let bookSpeed book =
     let endDate = book.ReadAt.Value.Date
     let daysCount = (endDate - startDate).TotalDays + 1.0
     (float pagesCount) / daysCount
-
-let createBookData (book, bookSpeed) = 
-    { Book = book.Book
-      PagesCount = book.NumPages.Value
-      DaysCount = int ((float book.NumPages.Value) * bookSpeed) }
-
+    
+let createBookData bookWithSpeed = 
+    match bookWithSpeed with
+    | Some(book, bookSpeed) -> 
+        Some { Book = book.Book
+               PagesCount = book.NumPages.Value
+               DaysCount = int ((float book.NumPages.Value) / bookSpeed) }
+    | None -> None
+    
 let basicStats readBooks = 
     let validBooks = 
         readBooks
@@ -35,11 +38,15 @@ let basicStats readBooks =
         |> Seq.map (fun r -> (r, bookSpeed r))
         |> Seq.sortByDescending (fun (_, speed) -> speed)
     
-    let fastestBook = booksSpeed |> Seq.head
-    let slowestBook = booksSpeed |> Seq.last
+    let fastestBook = booksSpeed |> Seq.tryHead
+    let slowestBook = booksSpeed |> Seq.tryLast
+    
+    let averagePagesCount = 
+        if (validBooks |> Seq.isEmpty) then 0.0
+        else validBooks |> Seq.averageBy (fun p -> double p.NumPages.Value)
     { BooksCount = validBooks.Length
       PagesCount = validBooks |> Seq.sumBy (fun p -> p.NumPages.Value)
       SlowestBook = createBookData slowestBook
       FastestBook = createBookData fastestBook
       AverageSpeed = 100.0
-      AveragePagesCount = validBooks |> Seq.averageBy (fun p -> double p.NumPages.Value) }
+      AveragePagesCount = averagePagesCount }

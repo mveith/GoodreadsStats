@@ -21,17 +21,17 @@ let defaultBasicStats =
     { BooksCount = 0
       PagesCount = 0
       SlowestBook = 
-          { Book = 
-                { Title = "???"
-                  Author = "???" }
-            PagesCount = 0
-            DaysCount = 0 }
+          Some { Book = 
+                    { Title = "???"
+                      Author = "???" }
+                 PagesCount = 0
+                 DaysCount = 0 }
       FastestBook = 
-          { Book = 
-                { Title = "???"
-                  Author = "???" }
-            PagesCount = 0
-            DaysCount = 0 }
+          Some { Book = 
+                    { Title = "???"
+                      Author = "???" }
+                 PagesCount = 0
+                 DaysCount = 0 }
       AverageSpeed = 0.0
       AveragePagesCount = 0.0 }
 
@@ -46,9 +46,12 @@ type BasicStatsTable(props) as this =
         >> unbox
         >> saveStats
     
-    let bookDescription (book : BookData) = 
-        [ R.span [] [ unbox book.Book.Title ]
-          R.span [] [ unbox (sprintf " (%s)" book.Book.Author) ] ]
+    let bookDescription (book : BookData option) = 
+        match book with
+        | Some book -> 
+            [ R.span [] [ unbox book.Book.Title ]
+              R.span [] [ unbox (sprintf " (%s)" book.Book.Author) ] ]
+        | None -> [R.span [] []]
     
     member x.componentDidMount() = 
         let url = completeUrlWithToken "basicStats" props.accessToken props.accessTokenSecret

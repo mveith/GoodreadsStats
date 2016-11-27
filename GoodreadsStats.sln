@@ -9,6 +9,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OAuth", "OAuth\OAuth.fsproj
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GoodreadsStats.Model", "GoodreadsStats.Model\GoodreadsStats.Model.fsproj", "{F759BCA9-9F6C-431B-986B-524160306FEF}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GoodreadsStats.Tests", "GoodreadsStats.Tests\GoodreadsStats.Tests.fsproj", "{79D5D965-101E-434B-9DE8-086317FF4202}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F759BCA9-9F6C-431B-986B-524160306FEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F759BCA9-9F6C-431B-986B-524160306FEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F759BCA9-9F6C-431B-986B-524160306FEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79D5D965-101E-434B-9DE8-086317FF4202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79D5D965-101E-434B-9DE8-086317FF4202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79D5D965-101E-434B-9DE8-086317FF4202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79D5D965-101E-434B-9DE8-086317FF4202}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,3 +5,4 @@ nuget FAKE
 nuget FSharp.Data
 nuget FSharp.Configuration
 nuget Newtonsoft.Json
+nuget NUnit

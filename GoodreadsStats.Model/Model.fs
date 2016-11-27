@@ -12,7 +12,7 @@ type BookData =
 type BasicStats = 
     { BooksCount : int
       PagesCount : int
-      SlowestBook : BookData
-      FastestBook : BookData
+      SlowestBook : BookData option
+      FastestBook : BookData option
       AverageSpeed : double
       AveragePagesCount : double }
