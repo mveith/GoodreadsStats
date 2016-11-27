@@ -18,9 +18,27 @@ let authorized token tokenSecret =
     let result = sprintf "%s|%s" token tokenSecret
     OK result
 
+let reviews accessData = 
+    let userId = getUserId accessData
+    getAllReviews accessData userId "read" "date_read"
+
+let createBook (r : Reviews.Review) = 
+    { ReadAt = parseOptionDate r.ReadAt
+      StartedAt = parseOptionDate r.StartedAt
+      NumPages = r.Book.NumPages
+      Book = 
+          { Title = r.Book.Title
+            Author = r.Book.Author.Name } }
+
 let basicStats token tokenSecret = 
     let accessData = getAccessData clientKey clientSecret token tokenSecret
-    json (basicStats accessData)
+    let reviews = reviews accessData
+    
+    let readBooks = 
+        reviews
+        |> Seq.map createBook
+        |> Seq.toArray
+    json (basicStats readBooks)
 
 let setCORSHeaders = setCORSHeaders clientSideUrl
 let requestWithTokenParams f = request (processRequestWithTokenParams f)

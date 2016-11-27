@@ -58,3 +58,8 @@ let goodreadsDataFormat = "ddd MMM dd HH:mm:ss zzz yyyy"
 let parseDate s = 
     System.DateTime.ParseExact(s, goodreadsDataFormat, System.Globalization.CultureInfo.InvariantCulture)
     
+let parseOptionDate (s:string option) = 
+    match s with
+    | Some value -> Some (parseDate value)
+    | None -> None
+    

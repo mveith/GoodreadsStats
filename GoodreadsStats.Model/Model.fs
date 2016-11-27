@@ -1,11 +1,11 @@
 ﻿namespace GoodreadsStats.Model
 
-type ReadBook = 
+type Book = 
     { Title : string
       Author : string }
       
 type BookData = 
-    { Book : ReadBook
+    { Book : Book
       PagesCount : int
       DaysCount : int }
 
