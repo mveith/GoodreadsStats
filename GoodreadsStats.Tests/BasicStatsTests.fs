@@ -4,14 +4,7 @@ open BasicStatsCalculator
 open GoodreadsStats.Model
 open System
 open NUnit.Framework
-
-let defaultBook = 
-    { ReadAt = Some(new DateTime(2016, 11, 27))
-      StartedAt = Some(new DateTime(2016, 11, 27))
-      NumPages = Some 1
-      Book = 
-          { Title = "Test Title"
-            Author = "Test Author" } }
+open Common
 
 [<Test>]
 let ``For no valid book return empty stats``() = 

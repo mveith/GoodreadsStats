@@ -44,7 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Common.fs" />
     <Compile Include="BasicStatsTests.fs" />
+    <Compile Include="AverageSpeedTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GoodreadsStats.Model\GoodreadsStats.Model.fsproj">
