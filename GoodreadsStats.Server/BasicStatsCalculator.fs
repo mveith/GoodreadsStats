@@ -22,11 +22,16 @@ let bookSpeed book =
 let createBookData bookWithSpeed = 
     match bookWithSpeed with
     | Some(book, bookSpeed) -> 
-        Some { Book = book.Book
-               PagesCount = book.NumPages.Value
-               DaysCount = int ((float book.NumPages.Value) / bookSpeed) }
-    | None -> None
-    
+        { Book = book.Book
+          PagesCount = book.NumPages.Value
+          DaysCount = int ((float book.NumPages.Value) / bookSpeed) }
+    | None -> 
+        { Book = 
+              { Title = ""
+                Author = "" }
+          PagesCount = 0
+          DaysCount = 0 }
+
 let averageSpeed books =
     if (books |> Seq.isEmpty) then 0.0
     else 

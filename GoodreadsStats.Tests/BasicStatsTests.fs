@@ -58,9 +58,8 @@ let ``Fastest book is book with greatest pages by day ratio``() =
     let book1 = { defaultBook with NumPages = Some 200; StartedAt = Some (startDate); ReadAt = Some (startDate.AddDays(2.0)) }
     let book2 = { defaultBook with NumPages = Some 150; StartedAt = Some (startDate); ReadAt = Some (startDate.AddDays(1.0)) }
     let stats = basicStats [ book1; book2 ]
-    Assert.That (stats.FastestBook.IsSome)
-    Assert.That (stats.FastestBook.Value.DaysCount, Is.EqualTo(2))
-    Assert.That (stats.FastestBook.Value.PagesCount, Is.EqualTo(150))
+    Assert.That (stats.FastestBook.DaysCount, Is.EqualTo(2))
+    Assert.That (stats.FastestBook.PagesCount, Is.EqualTo(150))
 
 [<Test>]
 let ``Slowest book is book with smallest pages by day ratio``() = 
@@ -68,6 +67,5 @@ let ``Slowest book is book with smallest pages by day ratio``() =
     let book1 = { defaultBook with NumPages = Some 200; StartedAt = Some (startDate); ReadAt = Some (startDate.AddDays(2.0)) }
     let book2 = { defaultBook with NumPages = Some 150; StartedAt = Some (startDate); ReadAt = Some (startDate.AddDays(1.0)) }
     let stats = basicStats [ book1; book2 ]
-    Assert.That (stats.SlowestBook.IsSome)
-    Assert.That (stats.SlowestBook.Value.DaysCount, Is.EqualTo(3))
-    Assert.That (stats.SlowestBook.Value.PagesCount, Is.EqualTo(200))
+    Assert.That (stats.SlowestBook.DaysCount, Is.EqualTo(3))
+    Assert.That (stats.SlowestBook.PagesCount, Is.EqualTo(200))
