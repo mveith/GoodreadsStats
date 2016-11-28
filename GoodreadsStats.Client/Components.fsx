@@ -46,9 +46,22 @@ type BasicStatsTable(props) as this =
         >> unbox
         >> saveStats
     
+    let image icon =
+        let iconStyle = sprintf "fa fa-%s fa-stack-1x fa-inverse" icon 
+        R.span [ ClassName "fa-stack fa-4x"] [
+            R.i [ ClassName "fa fa-circle fa-stack-2x text-primary"] []
+            R.i [ ClassName iconStyle] []]
+
     let bookDescription (book : BookData) = 
-        [ R.span [] [ unbox book.Book.Title ]
-          R.span [] [ unbox (sprintf " (%s)" book.Book.Author) ] ]
+        R.p [ ClassName "text-muted" ] [ 
+            R.span [] [ R.b [] [unbox book.Book.Title ]]
+            R.br [] []
+            R.i [] [ unbox "by" ]
+            R.br [] []
+            R.span [] [ unbox book.Book.Author ]
+            R.br [] []
+            unbox (sprintf "(%.2f pages / day)" (float book.PagesCount / float book.DaysCount)) ] 
+
     
     member x.componentDidMount() = 
         let url = completeUrlWithToken "basicStats" props.accessToken props.accessTokenSecret
@@ -56,15 +69,28 @@ type BasicStatsTable(props) as this =
     
     member x.render() = 
         let stats = this.state
-        R.div [ ClassName "basicStatsTable" ] [ R.table [] [ R.tr [] [ R.td [] [ unbox "Books count" ]
-                                                                       R.td [] [ unbox stats.BooksCount ] ]
-                                                             R.tr [] [ R.td [] [ unbox "Number of pages" ]
-                                                                       R.td [] [ unbox stats.PagesCount ] ]
-                                                             R.tr [] [ R.td [] [ unbox "Average book length" ]
-                                                                       R.td [] [ unbox stats.AveragePagesCount ] ]
-                                                             R.tr [] [ R.td [] [ unbox "Average speed" ]
-                                                                       R.td [] [ unbox stats.AverageSpeed ] ]
-                                                             R.tr [] [ R.td [] [ unbox "Fastest book" ]
-                                                                       R.td [] (bookDescription stats.FastestBook) ]
-                                                             R.tr [] [ R.td [] [ unbox "Slowest book" ]
-                                                                       R.td [] (bookDescription stats.SlowestBook) ] ] ]
+        R.div [ ClassName "row text-center" ] 
+            [ R.div [ ClassName "col-md-2" ] [
+                image "book"  
+                R.h4 [ ClassName "service-heading" ] [ unbox "Books count" ]
+                R.p [ ClassName "text-muted" ] [ unbox stats.BooksCount ] ]
+              R.div [ ClassName "col-md-2" ] [ 
+                image "database"  
+                R.h4 [ ClassName "service-heading" ] [ unbox "Number of pages" ] 
+                R.p [ ClassName "text-muted" ] [ unbox stats.PagesCount ] ]
+              R.div [ ClassName "col-md-2" ] [
+                image "arrows-h"   
+                R.h4 [ ClassName "service-heading" ] [ unbox "Average book" ]
+                R.p [ ClassName "text-muted" ] [ unbox (sprintf "%.1f pages" stats.AveragePagesCount) ] ]
+              R.div [ ClassName "col-md-2" ] [ 
+                image "bolt"
+                R.h4 [ ClassName "service-heading" ] [ unbox "Average speed" ]
+                R.p [ ClassName "text-muted" ] [ unbox (sprintf "%.2f pages / day" stats.AverageSpeed) ] ]
+              R.div [ ClassName "col-md-2" ] [
+                image "thumbs-up"    
+                R.h4 [ ClassName "service-heading" ] [ unbox "Fastest book" ]
+                bookDescription stats.FastestBook ]
+              R.div [ ClassName "col-md-2" ] [ 
+                image "bed"    
+                R.h4 [ ClassName "service-heading" ] [ unbox "Slowest book" ]
+                bookDescription stats.SlowestBook ] ]
