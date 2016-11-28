@@ -56,8 +56,7 @@ type BasicStatsTable(props) as this =
     
     member x.render() = 
         let stats = this.state
-        R.div [ ClassName "basicStatsTable" ] [ R.h1 [] [ unbox "Basic statistics" ]
-                                                R.table [] [ R.tr [] [ R.td [] [ unbox "Books count" ]
+        R.div [ ClassName "basicStatsTable" ] [ R.table [] [ R.tr [] [ R.td [] [ unbox "Books count" ]
                                                                        R.td [] [ unbox stats.BooksCount ] ]
                                                              R.tr [] [ R.td [] [ unbox "Number of pages" ]
                                                                        R.td [] [ unbox stats.PagesCount ] ]

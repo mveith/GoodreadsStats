@@ -61,7 +61,7 @@ let showBasicStats (accessToken, accessTokenSecret) =
         { accessToken = accessToken
           accessTokenSecret = accessTokenSecret }
     
-    let rootElement = Browser.document.getElementById "content"
+    let rootElement = Browser.document.getElementById "basic-stats-content"
     let reactComponent = R.com<BasicStatsTable, _, _> props []
     ReactDom.render (reactComponent, rootElement) |> ignore
 
