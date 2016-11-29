@@ -17,34 +17,9 @@ type AccessTokenData =
     { accessToken : string
       accessTokenSecret : string }
 
-let defaultBasicStats = 
-    { BooksCount = 0
-      PagesCount = 0
-      SlowestBook = 
-          { Book = 
-                { Title = "???"
-                  Author = "???" }
-            PagesCount = 0
-            DaysCount = 0 }
-      FastestBook = 
-          { Book = 
-                { Title = "???"
-                  Author = "???" }
-            PagesCount = 0
-            DaysCount = 0 }
-      AverageSpeed = 0.0
-      AveragePagesCount = 0.0 }
-
 type BasicStatsTable(props) as this = 
-    inherit React.Component<AccessTokenData, BasicStats>(props)
-    do this.state <- defaultBasicStats
-    let saveStats (books : BasicStats) = this.setState books
-    
-    let updateState = 
-        string
-        >> JS.JSON.parse
-        >> unbox
-        >> saveStats
+    inherit React.Component<BasicStats, BasicStats>(props)
+    do this.state <- props
     
     let image icon =
         let iconStyle = sprintf "fa fa-%s fa-stack-1x fa-inverse" icon 
@@ -62,11 +37,6 @@ type BasicStatsTable(props) as this =
             R.br [] []
             unbox (sprintf "(%.2f pages / day)" (float book.PagesCount / float book.DaysCount)) ] 
 
-    
-    member x.componentDidMount() = 
-        let url = completeUrlWithToken "basicStats" props.accessToken props.accessTokenSecret
-        ajax url updateState |> ignore
-    
     member x.render() = 
         let stats = this.state
         R.div [ ClassName "row text-center" ] 
@@ -94,3 +64,27 @@ type BasicStatsTable(props) as this =
                 image "bed"    
                 R.h4 [ ClassName "service-heading" ] [ unbox "Slowest book" ]
                 bookDescription stats.SlowestBook ] ]
+
+type BasicStatsSection(props) as this = 
+    inherit React.Component<AccessTokenData, BasicStatsSectionState>(props)
+    do this.state <- { Stats = None }
+
+    let saveStats (books : BasicStats) = this.setState ({ Stats = Some books })
+    
+    let updateState = 
+        string
+        >> JS.JSON.parse
+        >> unbox
+        >> saveStats
+ 
+    member x.componentDidMount() = 
+        let url = completeUrlWithToken "basicStats" props.accessToken props.accessTokenSecret
+        ajax url updateState |> ignore
+    
+    member x.render() =
+        let stats = this.state.Stats 
+        match stats with
+        | Some stats -> R.com<BasicStatsTable, _, _> stats []
+        | None -> R.div [ ClassName "row text-center"] [ unbox "Building stats..."]
+
+and BasicStatsSectionState = { Stats : BasicStats option;  }
