@@ -28,7 +28,7 @@ type BasicStatsTable(props) as this =
             R.i [ ClassName iconStyle] []]
 
     let bookDescription (book : BookData) = 
-        R.p [ ClassName "text-muted" ] [ 
+        [ 
             R.span [] [ R.b [] [unbox book.Book.Title ]]
             R.br [] []
             R.i [] [ unbox "by" ]
@@ -37,33 +37,22 @@ type BasicStatsTable(props) as this =
             R.br [] []
             unbox (sprintf "(%.2f pages / day)" (float book.PagesCount / float book.DaysCount)) ] 
 
+    let valueBox label icon content=
+        R.div [ ClassName "col-md-2" ] [ 
+                image icon  
+                R.h4 [ ClassName "service-heading" ] [ unbox label ] 
+                R.p [ ClassName "text-muted" ] content ]
+
     member x.render() = 
         let stats = this.state
         R.div [ ClassName "row text-center" ] 
-            [ R.div [ ClassName "col-md-2" ] [
-                image "book"  
-                R.h4 [ ClassName "service-heading" ] [ unbox "Books count" ]
-                R.p [ ClassName "text-muted" ] [ unbox stats.BooksCount ] ]
-              R.div [ ClassName "col-md-2" ] [ 
-                image "database"  
-                R.h4 [ ClassName "service-heading" ] [ unbox "Number of pages" ] 
-                R.p [ ClassName "text-muted" ] [ unbox stats.PagesCount ] ]
-              R.div [ ClassName "col-md-2" ] [
-                image "arrows-h"   
-                R.h4 [ ClassName "service-heading" ] [ unbox "Average book" ]
-                R.p [ ClassName "text-muted" ] [ unbox (sprintf "%.1f pages" stats.AveragePagesCount) ] ]
-              R.div [ ClassName "col-md-2" ] [ 
-                image "bolt"
-                R.h4 [ ClassName "service-heading" ] [ unbox "Average speed" ]
-                R.p [ ClassName "text-muted" ] [ unbox (sprintf "%.2f pages / day" stats.AverageSpeed) ] ]
-              R.div [ ClassName "col-md-2" ] [
-                image "thumbs-up"    
-                R.h4 [ ClassName "service-heading" ] [ unbox "Fastest book" ]
-                bookDescription stats.FastestBook ]
-              R.div [ ClassName "col-md-2" ] [ 
-                image "bed"    
-                R.h4 [ ClassName "service-heading" ] [ unbox "Slowest book" ]
-                bookDescription stats.SlowestBook ] ]
+            [
+                valueBox  "Books count" "book" [ unbox stats.BooksCount ]
+                valueBox  "Number of pages" "database" [ unbox stats.PagesCount ]
+                valueBox  "Average book" "arrows-h" [ unbox (sprintf "%.1f pages" stats.AveragePagesCount) ]
+                valueBox  "Average speed" "bolt" [ unbox (sprintf "%.2f pages / day" stats.AverageSpeed) ]
+                valueBox  "Fastest book" "thumbs-up" (bookDescription stats.FastestBook)
+                valueBox  "Slowest book" "bed" (bookDescription stats.SlowestBook) ]
 
 type BasicStatsSection(props) as this = 
     inherit React.Component<AccessTokenData, BasicStatsSectionState>(props)
