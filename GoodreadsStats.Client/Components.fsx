@@ -66,14 +66,23 @@ type BasicStatsSection(props) as this =
         >> unbox
         >> saveStats
  
+    let statsTable stats=
+        match stats with
+        | Some stats -> R.com<BasicStatsTable, _, _> stats []
+        | None -> R.div [ ClassName "row text-center"] [ unbox "Building stats..."]
+
     member x.componentDidMount() = 
         let url = completeUrlWithToken "basicStats" props.accessToken props.accessTokenSecret
         ajax url updateState |> ignore
     
+    
     member x.render() =
-        let stats = this.state.Stats 
-        match stats with
-        | Some stats -> R.com<BasicStatsTable, _, _> stats []
-        | None -> R.div [ ClassName "row text-center"] [ unbox "Building stats..."]
+        R.section [Id "basic-stats"] [
+            R.div [ClassName "container"] [
+                R.div [ClassName "row"] [
+                    R.div [ClassName "col-lg-12 text-center"] [
+                        R.h2 [ClassName "section-heading"] [ unbox "Basic statistics"]
+                        R.h3 [ClassName "section-subheading text-muted"] [ unbox "Basic statistics for read books."] ] ]
+                statsTable this.state.Stats ] ]
 
 and BasicStatsSectionState = { Stats : BasicStats option;  }
