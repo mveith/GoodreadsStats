@@ -71,9 +71,13 @@ let onPageLoad() =
     | Some(accessToken, accessTokenSecret) -> showBasicStats (accessToken, accessTokenSecret)
     | None -> tryAuthorize showBasicStats
 
-Globals.jQuery.Invoke("#loginButton").click(fun _ -> login())
+Globals.jQuery.Invoke("#login-button").click(fun _ -> login())
 onPageLoad()
 
 let footerElement = Browser.document.getElementById "footer-content"
 let footerComponent = R.com<Footer, _, _> [] []
 ReactDom.render (footerComponent, footerElement) |> ignore
+
+let headerElement = Browser.document.getElementById "header-content"
+let headerComponent = R.com<Header, _, _> [] []
+ReactDom.render (headerComponent, headerElement) |> ignore

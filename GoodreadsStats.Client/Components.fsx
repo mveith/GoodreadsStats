@@ -102,3 +102,17 @@ type Footer(props) as this =
                                 R.li [] [
                                     R.a [ Href "#"] [
                                         R.i [ ClassName "fa fa-twitter"] []]]]]]]]
+
+type Header(props) as this = 
+    inherit React.Component<obj, obj>(props)
+    do this.state <- []
+
+    member x.render() =
+        R.header [] [
+            R.div [ClassName "container"] [
+                R.div [ClassName "intro-text"] [
+                    R.div [ClassName "intro-lead-in"][ unbox "Welcome To Goodreads Statistics!"]
+                    R.div [ClassName "intro-heading"] [ unbox "Discover bookworm in you."]
+                    R.button [ Id "login-button"; ClassName "page-scroll btn btn-xl"] [unbox "Login"]
+                    unbox " "
+                    R.a [ Href "#basic-stats"; ClassName "page-scroll btn btn-xl"] [unbox "Show"]]]]
