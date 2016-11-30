@@ -86,3 +86,19 @@ type BasicStatsSection(props) as this =
                 statsTable this.state.Stats ] ]
 
 and BasicStatsSectionState = { Stats : BasicStats option;  }
+
+type Footer(props) as this = 
+    inherit React.Component<obj, obj>(props)
+    do this.state <- []
+
+    member x.render() =
+        R.footer [] [
+            R.div [ClassName "container"] [
+                R.div [ClassName "row"] [
+                    R.div [ClassName "col-md-6"][
+                        R.span [ClassName "copyright"] [ unbox (sprintf "Copyright © Goodreads Stats %i" System.DateTime.Today.Year)]]
+                    R.div [ClassName "col-md-6"] [
+                            R.ul [ClassName "list-inline social-buttons"] [
+                                R.li [] [
+                                    R.a [ Href "#"] [
+                                        R.i [ ClassName "fa fa-twitter"] []]]]]]]]

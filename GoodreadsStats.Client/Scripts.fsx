@@ -73,3 +73,7 @@ let onPageLoad() =
 
 Globals.jQuery.Invoke("#loginButton").click(fun _ -> login())
 onPageLoad()
+
+let footerElement = Browser.document.getElementById "footer-content"
+let footerComponent = R.com<Footer, _, _> [] []
+ReactDom.render (footerComponent, footerElement) |> ignore
