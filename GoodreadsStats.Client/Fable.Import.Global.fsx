@@ -15,6 +15,9 @@ type CookiesStatic =
 [<Global>]
 let decodeURIComponent : string -> string = failwith "JS only"
 
+[<Global; Emit("initAgency()")>]
+let initAgency () = failwith "JS only" 
+
 type Globals = 
     
     [<Global; Emit("jQuery")>]

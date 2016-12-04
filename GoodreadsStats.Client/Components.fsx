@@ -109,10 +109,25 @@ type Header(props) as this =
 
     member x.render() =
         R.header [] [
-            R.div [ClassName "container"] [
+            R.div [ClassName "container" ] [
                 R.div [ClassName "intro-text"] [
                     R.div [ClassName "intro-lead-in"][ unbox "Welcome To Goodreads Statistics!"]
                     R.div [ClassName "intro-heading"] [ unbox "Discover bookworm in you."]
                     R.button [ Id "login-button"; ClassName "page-scroll btn btn-xl"] [unbox "Login"]
                     unbox " "
                     R.a [ Href "#basic-stats"; ClassName "page-scroll btn btn-xl"] [unbox "Show"]]]]
+
+
+type Navigation(props) as this = 
+    inherit React.Component<obj, obj>(props)
+    do this.state <- []
+
+    member x.render() =
+        R.nav [Id "mainNav" ; ClassName "navbar navbar-default navbar-custom navbar-fixed-top affix-top"] [
+            R.div [ClassName "container"] [
+                R.div [ClassName "navbar-header page-scroll"] [
+                    R.a [ClassName "navbar-brand page-scroll"; Href "#page-top"] [unbox "Goodreads Statistics"]]
+                R.div [] [
+                    R.ul [ClassName "nav navbar-nav navbar-right"] [
+                        R.li [ClassName "hidden"] [ R.a [Href "#page-top"] []]
+                        R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]]]]]

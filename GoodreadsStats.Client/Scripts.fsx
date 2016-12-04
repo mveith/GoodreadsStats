@@ -11,7 +11,6 @@ open Components
 open Utils
 
 module R = Fable.Helpers.React
-
 let parseTokenAndSecret (result : string) = 
     let parts = result.Split([| "|" |], System.StringSplitOptions.RemoveEmptyEntries)
     (parts.[0], parts.[1])
@@ -71,9 +70,6 @@ let onPageLoad() =
     | Some(accessToken, accessTokenSecret) -> showBasicStats (accessToken, accessTokenSecret)
     | None -> tryAuthorize showBasicStats
 
-Globals.jQuery.Invoke("#login-button").click(fun _ -> login())
-onPageLoad()
-
 let footerElement = Browser.document.getElementById "footer-content"
 let footerComponent = R.com<Footer, _, _> [] []
 ReactDom.render (footerComponent, footerElement) |> ignore
@@ -81,3 +77,11 @@ ReactDom.render (footerComponent, footerElement) |> ignore
 let headerElement = Browser.document.getElementById "header-content"
 let headerComponent = R.com<Header, _, _> [] []
 ReactDom.render (headerComponent, headerElement) |> ignore
+
+let navigationElement = Browser.document.getElementById "navigation-content"
+let navigationComponent = R.com<Navigation, _, _> [] []
+ReactDom.render (navigationComponent,navigationElement) |> ignore
+
+Globals.jQuery.Invoke("#login-button").click(fun _ -> login())
+onPageLoad()
+initAgency()
