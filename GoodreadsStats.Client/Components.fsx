@@ -131,3 +131,14 @@ type Navigation(props) as this =
                     R.ul [ClassName "nav navbar-nav navbar-right"] [
                         R.li [ClassName "hidden"] [ R.a [Href "#page-top"] []]
                         R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]]]]]
+
+type App(props) as this=
+    inherit React.Component<obj, obj>(props)
+    do this.state <- []
+    member x.render() =
+        R.div [] [
+            R.com<Navigation, _, _> [] []
+            R.com<Header, _, _> [] []
+            R.div [Id "basic-stats-content"][]
+            R.com<Footer, _, _> [] []
+        ]
