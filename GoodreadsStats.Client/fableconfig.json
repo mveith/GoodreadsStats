@@ -1,8 +1,13 @@
 {
-    "module": "amd",
     "sourceMaps": true,
-    "projFile": "scripts.fsx",
-    "outDir": "scripts",
-    "scripts": {
+    "projFile": "Scripts.fsx",
+    "rollup": {
+        "dest": "./scripts/bundle.js",
+        "external": ["react", "react-dom", "redux"],
+        "globals": {
+            "react": "React",
+            "react-dom": "ReactDOM",
+            "redux": "Redux"
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿#r "node_modules/fable-core/Fable.Core.dll"
+#r "node_modules/fable-powerpack/Fable.PowerPack.dll"
+#r "node_modules/fable-react/Fable.React.dll"
 #load "Fable.Import.Global.fsx"
-#load "node_modules/fable-import-react/Fable.Import.React.fs"
-#load "node_modules/fable-import-react/Fable.Helpers.React.fs"
 #load "Utils.fsx"
 #load "Components.fsx"
 
@@ -11,31 +11,10 @@ open Components
 open Utils
 
 module R = Fable.Helpers.React
-let parseTokenAndSecret (result : string) = 
-    let parts = result.Split([| "|" |], System.StringSplitOptions.RemoveEmptyEntries)
-    (parts.[0], parts.[1])
 
-let parseTokenAndSecretAndUrl (result : string) = 
-    let parts = result.Split([| "|" |], System.StringSplitOptions.RemoveEmptyEntries)
-    (parts.[0], parts.[1], parts.[2])
-
-let saveAndReturnAuthorizationUrl result = 
-    let (token, secret, url) = parseTokenAndSecretAndUrl result
-    setCookie "authorizationToken" token 1
-    setCookie "authorizationTokenSecret" secret 1
-    url
-
-let login() = 
-    ajax (completeUrl "authorizationUrl") (string
-                                           >> saveAndReturnAuthorizationUrl
-                                           >> navigateTo)
-
-let getAccessToken() = 
-    let token = Globals.cookies.get ("accessToken")
-    let secret = Globals.cookies.get ("accessTokenSecret")
-    match token with
-    | Some token -> option.Some(token, secret.Value)
-    | None -> option.None
+let reducer (state: State) = function
+    | Login (token, secret)-> { state with Logged = true; AccessData = Some { accessToken = token; accessTokenSecret = secret  }}
+    | SaveBasicStats stats -> { state with BasicStats = Some stats}
 
 let saveAccessToken (accessToken, accessTokenSecret) = 
     let accessToken = string accessToken
@@ -43,37 +22,36 @@ let saveAccessToken (accessToken, accessTokenSecret) =
     setCookie "accessTokenSecret" accessTokenSecret 7
     (accessToken, accessTokenSecret)
 
-let tryAuthorize onSuccess = 
-    let token = getQueryVariable "oauth_token"
-    let secret = Globals.cookies.get ("authorizationTokenSecret")
+let store = Redux.createStore reducer {Logged = false; BasicStats = None; AccessData = None }
+
+ReactDom.render(
+    R.com<App,_,_> { Store=store } [],
+    Browser.document.getElementById "content"
+) |> ignore
+
+let downloadBasicStats accessToken accessTokenSecret =
+    let saveStats stats= Redux.dispatch store (SaveBasicStats stats) 
+    let url = completeUrlWithToken "basicStats" accessToken accessTokenSecret
+    ajax url (string >> JS.JSON.parse >> unbox >> saveStats) |> ignore
+
+let login accessToken accessTokenSecret=
+    downloadBasicStats accessToken accessTokenSecret
+    Redux.dispatch store (Login (accessToken, accessTokenSecret))
+let token = getQueryVariable "oauth_token"
+let secret = Globals.cookies.get ("authorizationTokenSecret")
+match token with
+| Some token -> 
+    let url = completeUrlWithToken "authorized" token secret.Value
+    ajax url (string
+                >> parseTokenAndSecret
+                >> saveAccessToken
+                >> (fun (accessToken, accessTokenSecret) ->
+                    downloadBasicStats accessToken accessTokenSecret
+                    Redux.dispatch store (Login (accessToken, accessTokenSecret)) ))
+| None -> 
+    let token = Globals.cookies.get ("accessToken")
     match token with
     | Some token -> 
-        let url = completeUrlWithToken "authorized" token secret.Value
-        ajax url (string
-                  >> parseTokenAndSecret
-                  >> saveAccessToken
-                  >> onSuccess)
+        let secret = Globals.cookies.get ("accessTokenSecret")
+        login token secret.Value
     | None -> ()
-
-let showBasicStats (accessToken, accessTokenSecret) = 
-    let props = 
-        { accessToken = accessToken
-          accessTokenSecret = accessTokenSecret }
-    
-    let rootElement = Browser.document.getElementById "basic-stats-content"
-    let reactComponent = R.com<BasicStatsSection, _, _> props []
-    ReactDom.render (reactComponent, rootElement) |> ignore
-
-let onPageLoad() = 
-    let accessToken = getAccessToken()
-    match accessToken with
-    | Some(accessToken, accessTokenSecret) -> showBasicStats (accessToken, accessTokenSecret)
-    | None -> tryAuthorize showBasicStats
-
-let contentElement = Browser.document.getElementById "content"
-let contentComponent = R.com<App, _, _> [] []
-ReactDom.render (contentComponent, contentElement) |> ignore
-
-Globals.jQuery.Invoke("#login-button").click(fun _ -> login())
-onPageLoad()
-initAgency()

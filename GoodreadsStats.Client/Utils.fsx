@@ -12,18 +12,26 @@ let completeUrlWithToken methodName token tokenSecret =
     let query = sprintf "?token=%s&tokenSecret=%s" token tokenSecret
     (completeUrl methodName) + query
 
-let keyValuePair (var : string) = 
-    let parts = var.Split '='
-    let keyPart = Seq.item 0 parts
-    let valuePart = Seq.item 1 parts
-    (decodeURIComponent keyPart, decodeURIComponent valuePart)
+let keyValuePair (var : string) =
+    let parts = var.Split '='    
+    match parts with
+    | [|keyPart; valuePart|] -> (decodeURIComponent keyPart, decodeURIComponent valuePart)
+    | _ -> ("", "")
 
 let getQueryVariable variable = 
     let query = window.location.search.Substring 1
+    
     query.Split '&'
     |> Seq.map keyValuePair
     |> Seq.filter (fun (key, _) -> key = variable)
     |> Seq.map (fun (_, value) -> value)
-    |> Seq.tryHead
+    |> Seq.tryHead        
 
 let navigateTo url = window.location.href <- url
+
+let parseTokenAndSecret (result : string) = 
+    let parts = result.Split([| "|" |], System.StringSplitOptions.RemoveEmptyEntries)
+    (parts.[0], parts.[1])
+let parseTokenAndSecretAndUrl (result : string) = 
+    let parts = result.Split([| "|" |], System.StringSplitOptions.RemoveEmptyEntries)
+    (parts.[0], parts.[1], parts.[2])

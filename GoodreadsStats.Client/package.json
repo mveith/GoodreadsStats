@@ -13,18 +13,20 @@
     "license": "ISC",
     "dependencies": {
         "core-js": "^2.4.1",
-        "fable-core": "^0.5.5",
+        "fable-core": "^0.7.14",
         "requirejs": "^2.3.2",
         "react": "15.3.2",
         "react-dom": "15.3.2",
+        "redux": "^3.6.0",
         "bootstrap": "^3.3.7",
-        "font-awesome": "^4.7.0"
+        "font-awesome": "^4.7.0",
+        "fable-powerpack": "^0.0.18"
     },
     "devDependencies": {
         "babel-plugin-transform-runtime": "^6.6.0",
-        "fable-import-react": "^0.5.0"
+        "fable-react": "^0.7.11"
     },
     "engines": {
-        "fable": "^0.5.9"
+        "fable": "^0.7.14"
     }
 }

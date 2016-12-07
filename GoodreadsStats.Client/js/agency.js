@@ -1,6 +1,6 @@
 // Agency Theme JavaScript
 
-function initAgency() {
+(function($) {
     "use strict"; // Start of use strict
 
     // jQuery for page scrolling feature - requires jQuery Easing plugin
@@ -19,8 +19,8 @@ function initAgency() {
     });
 
     // Closes the Responsive Menu on Menu Item Click
-    $('.navbar-collapse ul li a').click(function() {
-        $('.navbar-toggle:visible').click();
+    $('.navbar-collapse ul li a').click(function(){ 
+            $('.navbar-toggle:visible').click();
     });
 
     // Offset for Main Navigation
@@ -28,5 +28,6 @@ function initAgency() {
         offset: {
             top: 100
         }
-    });
-}
+    })
+
+})(jQuery); // End of use strict

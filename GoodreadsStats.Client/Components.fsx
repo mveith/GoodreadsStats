@@ -1,25 +1,65 @@
 ﻿#r "node_modules/fable-core/Fable.Core.dll"
+#r "node_modules/fable-powerpack/Fable.PowerPack.dll"
+#r "node_modules/fable-react/Fable.React.dll"
 #load "Fable.Import.Global.fsx"
-#load "node_modules/fable-import-react/Fable.Import.React.fs"
-#load "node_modules/fable-import-react/Fable.Helpers.React.fs"
 #load "../GoodreadsStats.Model/Model.fs"
 #load "Utils.fsx"
+module Redux =
+    open System
+    open Fable.Import
+    open Fable.Core
+    open Fable.Core.JsInterop
 
-module R = Fable.Helpers.React
+    type IStore<'TState, 'TAction> = interface end
+
+    let [<Import("createStore","redux")>] private createStore' = obj()
+
+    let createStore (reducer: 'TState->'TAction->'TState) (initState: 'TState) =
+        // Check if the action is a union type before applying the reducer
+        let reducer = fun state action ->
+            match box action?Case with
+            | :? string -> reducer state action
+            | _ -> state
+        match unbox Browser.window?devToolsExtension with
+        | Some ext -> createStore'$(Func<_,_,_> reducer, initState, ext$())
+        | None -> createStore'$(Func<_,_,_> reducer, initState)
+        |> unbox<IStore<'TState, 'TAction>>
+
+    let dispatch (store: IStore<'TState, 'TAction>) (x: 'TAction) =
+        let x = toPlainJsObj x
+        x?``type`` <- x?Case
+        store?dispatch(x) |> ignore
+
+    let inline subscribe (store: IStore<'TState, 'TAction>) (f: unit->unit) =
+        store?subscribe(f) |> ignore
+
+    let inline getState (store: IStore<'TState, 'TAction>) =
+        store?getState() |> unbox<'TState>
 
 open Fable.Import
 open Fable.Import.Global
 open Utils
-open R.Props
 open GoodreadsStats.Model
+open Fable.Core
+open Fable.Import
+module R = Fable.Helpers.React
+open R.Props
 
+[<Pojo>]
 type AccessTokenData = 
     { accessToken : string
       accessTokenSecret : string }
 
+type Action =
+    | Login of string * string
+    | SaveBasicStats of BasicStats
+
+[<Pojo>]
+type BasicStatsTableProps = { BasicStats :BasicStats }
+
 type BasicStatsTable(props) as this = 
-    inherit React.Component<BasicStats, BasicStats>(props)
-    do this.state <- props
+    inherit React.Component<BasicStatsTableProps, obj>(props)
+    do base.setInitState([])
     
     let image icon =
         let iconStyle = sprintf "fa fa-%s fa-stack-1x fa-inverse" icon 
@@ -44,9 +84,8 @@ type BasicStatsTable(props) as this =
                 R.p [ ClassName "text-muted" ] content ]
 
     member x.render() = 
-        let stats = this.state
-        R.div [ ClassName "row text-center" ] 
-            [
+        let stats = this.props.BasicStats
+        R.div [ ClassName "row text-center" ] [
                 valueBox  "Books count" "book" [ unbox stats.BooksCount ]
                 valueBox  "Number of pages" "database" [ unbox stats.PagesCount ]
                 valueBox  "Average book" "arrows-h" [ unbox (sprintf "%.1f pages" stats.AveragePagesCount) ]
@@ -54,42 +93,35 @@ type BasicStatsTable(props) as this =
                 valueBox  "Fastest book" "thumbs-up" (bookDescription stats.FastestBook)
                 valueBox  "Slowest book" "bed" (bookDescription stats.SlowestBook) ]
 
-type BasicStatsSection(props) as this = 
-    inherit React.Component<AccessTokenData, BasicStatsSectionState>(props)
-    do this.state <- { Stats = None }
 
-    let saveStats (books : BasicStats) = this.setState ({ Stats = Some books })
-    
-    let updateState = 
-        string
-        >> JS.JSON.parse
-        >> unbox
-        >> saveStats
- 
+[<Pojo>]
+type BasicStatsSectionState={Stats : BasicStats option; Logged:bool}
+
+type BasicStatsSection(props) as this = 
+    inherit React.Component<BasicStatsSectionState, obj>(props)
+    do base.setInitState ([])
+
     let statsTable stats=
         match stats with
-        | Some stats -> R.com<BasicStatsTable, _, _> stats []
+        | Some stats -> R.com<BasicStatsTable, _, _> {BasicStats = stats} []
         | None -> R.div [ ClassName "row text-center"] [ unbox "Building stats..."]
 
-    member x.componentDidMount() = 
-        let url = completeUrlWithToken "basicStats" props.accessToken props.accessTokenSecret
-        ajax url updateState |> ignore
-    
-    
     member x.render() =
-        R.section [Id "basic-stats"] [
-            R.div [ClassName "container"] [
-                R.div [ClassName "row"] [
-                    R.div [ClassName "col-lg-12 text-center"] [
-                        R.h2 [ClassName "section-heading"] [ unbox "Basic statistics"]
-                        R.h3 [ClassName "section-subheading text-muted"] [ unbox "Basic statistics for read books."] ] ]
-                statsTable this.state.Stats ] ]
+        if this.props.Logged
+        then 
+            R.section [Id "basic-stats"] [
+                R.div [ClassName "container"] [
+                    R.div [ClassName "row"] [
+                        R.div [ClassName "col-lg-12 text-center"] [
+                            R.h2 [ClassName "section-heading"] [ unbox "Basic statistics"]
+                            R.h3 [ClassName "section-subheading text-muted"] [ unbox "Basic statistics for read books."] ] ]
+                    statsTable this.props.Stats ] ]
+        else R.div [] []
 
-and BasicStatsSectionState = { Stats : BasicStats option;  }
 
 type Footer(props) as this = 
     inherit React.Component<obj, obj>(props)
-    do this.state <- []
+    do base.setInitState []
 
     member x.render() =
         R.footer [] [
@@ -102,25 +134,35 @@ type Footer(props) as this =
                                 R.li [] [
                                     R.a [ Href "#"] [
                                         R.i [ ClassName "fa fa-twitter"] []]]]]]]]
+[<Pojo>]
+type HeaderProps = {OnLogin : unit -> unit; Logged:bool }
 
 type Header(props) as this = 
-    inherit React.Component<obj, obj>(props)
-    do this.state <- []
+    inherit React.Component<HeaderProps, obj>(props)
+    do base.setInitState ([])
 
-    member x.render() =
+    let login event =
+        this.props.OnLogin()
+
+    member x.render() =            
+        let loginButton =
+            if not this.props.Logged then 
+                R.button [ Id "login-button"; ClassName "page-scroll btn btn-xl"; OnClick login ] [unbox "Login"] 
+                else unbox " " 
+
         R.header [] [
             R.div [ClassName "container" ] [
                 R.div [ClassName "intro-text"] [
                     R.div [ClassName "intro-lead-in"][ unbox "Welcome To Goodreads Statistics!"]
                     R.div [ClassName "intro-heading"] [ unbox "Discover bookworm in you."]
-                    R.button [ Id "login-button"; ClassName "page-scroll btn btn-xl"] [unbox "Login"]
+                    loginButton
                     unbox " "
                     R.a [ Href "#basic-stats"; ClassName "page-scroll btn btn-xl"] [unbox "Show"]]]]
 
 
 type Navigation(props) as this = 
     inherit React.Component<obj, obj>(props)
-    do this.state <- []
+    do base.setInitState([])
 
     member x.render() =
         R.nav [Id "mainNav" ; ClassName "navbar navbar-default navbar-custom navbar-fixed-top affix-top"] [
@@ -132,13 +174,37 @@ type Navigation(props) as this =
                         R.li [ClassName "hidden"] [ R.a [Href "#page-top"] []]
                         R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]]]]]
 
-type App(props) as this=
-    inherit React.Component<obj, obj>(props)
-    do this.state <- []
+type State =  { Logged:bool; BasicStats: BasicStats option; AccessData : AccessTokenData option;}
+[<Pojo>]
+type AppState = {State : State; Dispatch : Action -> unit }
+[<Pojo>]
+type AppProps = { Store: Redux.IStore<State, Action> }
+
+type App(props) as this =
+    inherit React.Component<AppProps, AppState>(props)
+    let dispatch = Redux.dispatch this.props.Store
+
+    let getState() = { State=Redux.getState this.props.Store; Dispatch=dispatch }
+
+    do base.setInitState(getState())
+    do Redux.subscribe this.props.Store (getState >> this.setState)
+
+    let saveAndReturnAuthorizationUrl result = 
+        let (token, secret, url) = parseTokenAndSecretAndUrl result
+        setCookie "authorizationToken" token 1
+        setCookie "authorizationTokenSecret" secret 1
+        url
+
+    let login()= 
+        ajax (completeUrl "authorizationUrl") (string
+                                           >> saveAndReturnAuthorizationUrl
+                                           >> navigateTo)
+        
     member x.render() =
+        let state = getState().State
         R.div [] [
             R.com<Navigation, _, _> [] []
-            R.com<Header, _, _> [] []
-            R.div [Id "basic-stats-content"][]
+            R.com<Header, _, _> { OnLogin = login; Logged = state.Logged } []
+            R.com<BasicStatsSection, _, _> {Stats =  state.BasicStats; Logged = state.Logged} []            
             R.com<Footer, _, _> [] []
         ]
