@@ -149,6 +149,11 @@ type Header(props) as this =
             if not this.props.Logged then 
                 R.button [ Id "login-button"; ClassName "page-scroll btn btn-xl"; OnClick login ] [unbox "Login"] 
                 else unbox " " 
+        
+        let showStatsButton =
+            if this.props.Logged then 
+                R.a [ Href "#basic-stats"; ClassName "page-scroll btn btn-xl"] [unbox "Show"]
+                else unbox " " 
 
         R.header [] [
             R.div [ClassName "container" ] [
@@ -157,14 +162,21 @@ type Header(props) as this =
                     R.div [ClassName "intro-heading"] [ unbox "Discover bookworm in you."]
                     loginButton
                     unbox " "
-                    R.a [ Href "#basic-stats"; ClassName "page-scroll btn btn-xl"] [unbox "Show"]]]]
+                    showStatsButton]]]
 
+[<Pojo>]
+type NavigationProps = {Logged:bool }
 
 type Navigation(props) as this = 
-    inherit React.Component<obj, obj>(props)
+    inherit React.Component<NavigationProps, obj>(props)
     do base.setInitState([])
 
     member x.render() =
+        let showBasicStatsButton = 
+            if this.props.Logged then 
+                R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]
+                else unbox " " 
+
         R.nav [Id "mainNav" ; ClassName "navbar navbar-default navbar-custom navbar-fixed-top affix-top"] [
             R.div [ClassName "container"] [
                 R.div [ClassName "navbar-header page-scroll"] [
@@ -172,7 +184,7 @@ type Navigation(props) as this =
                 R.div [] [
                     R.ul [ClassName "nav navbar-nav navbar-right"] [
                         R.li [ClassName "hidden"] [ R.a [Href "#page-top"] []]
-                        R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]]]]]
+                        showBasicStatsButton]]]]
 
 type State =  { Logged:bool; BasicStats: BasicStats option; AccessData : AccessTokenData option;}
 [<Pojo>]
@@ -203,7 +215,7 @@ type App(props) as this =
     member x.render() =
         let state = getState().State
         R.div [] [
-            R.com<Navigation, _, _> [] []
+            R.com<Navigation, _, _> {Logged = state.Logged} []
             R.com<Header, _, _> { OnLogin = login; Logged = state.Logged } []
             R.com<BasicStatsSection, _, _> {Stats =  state.BasicStats; Logged = state.Logged} []            
             R.com<Footer, _, _> [] []
