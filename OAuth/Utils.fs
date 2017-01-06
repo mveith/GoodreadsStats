@@ -2,6 +2,7 @@
 
 open System    
 open System.Text.RegularExpressions
+open System.Globalization
 
 let unreservedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~"
 
@@ -13,7 +14,7 @@ let (|ParseRegex|_|) regex str =
 
 let timeStamp() = 
     let ts = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0))
-    let timeStamp = ts.TotalSeconds.ToString()
+    let timeStamp = ts.TotalSeconds.ToString(CultureInfo.InvariantCulture)
     let timeStamp = timeStamp.Substring(0, timeStamp.IndexOf("."))
     timeStamp
 
