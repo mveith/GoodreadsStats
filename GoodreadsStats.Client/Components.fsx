@@ -166,11 +166,14 @@ type Header(props) as this =
                     showStatsButton]]]
 
 [<Pojo>]
-type NavigationProps = {Logged:bool; LoggedUserName:string; }
+type NavigationProps = {Logged:bool; LoggedUserName:string; OnLogout : unit -> unit;}
 
 type Navigation(props) as this = 
     inherit React.Component<NavigationProps, obj>(props)
     do base.setInitState([])
+
+    let logout event =
+        this.props.OnLogout()
 
     member x.render() =
         let showBasicStatsButton = 
@@ -180,7 +183,7 @@ type Navigation(props) as this =
 
         let showLogoutButton = 
             if this.props.Logged then 
-                R.li [] [ R.a [ Href "#logout"] [unbox (this.props.LoggedUserName + " (Logout)")]]
+                R.li [] [ R.a [ Href "#logout"; OnClick logout] [unbox (this.props.LoggedUserName + " (Logout)")]]
                 else unbox " "
 
         R.nav [Id "mainNav" ; ClassName "navbar navbar-default navbar-custom navbar-fixed-top affix-top"] [
@@ -218,11 +221,15 @@ type App(props) as this =
         ajax (completeUrl "authorizationUrl") (string
                                            >> saveAndReturnAuthorizationUrl
                                            >> navigateTo)
+    let logout()= 
+        removeCookie "accessToken"
+        removeCookie "accessTokenSecret"
+        navigateTo "/"
         
     member x.render() =
         let state = getState().State
         R.div [] [
-            R.com<Navigation, _, _> {Logged = state.Logged; LoggedUserName = state.LoggedUserName} []
+            R.com<Navigation, _, _> {Logged = state.Logged; LoggedUserName = state.LoggedUserName; OnLogout = logout} []
             R.com<Header, _, _> { OnLogin = login; Logged = state.Logged } []
             R.com<BasicStatsSection, _, _> {Stats =  state.BasicStats; Logged = state.Logged} []            
             R.com<Footer, _, _> [] []

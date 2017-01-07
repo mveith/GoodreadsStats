@@ -11,6 +11,7 @@ type CookieSettings =
 type CookiesStatic = 
     abstract get : key:string -> string option
     abstract set : key:string * value:string * settings:CookieSettings -> unit
+    abstract remove : key:string * settings:CookieSettings -> unit
 
 [<Global>]
 let decodeURIComponent : string -> string = failwith "JS only"
@@ -45,3 +46,8 @@ let setCookie key value expires =
         { new CookieSettings with
               member x.expires = option.Some expires }
     Globals.cookies.set (key, value, settings)
+
+let removeCookie key = 
+    let settings = 
+        { new CookieSettings with member x.expires = option.None }
+    Globals.cookies.remove (key, settings)
