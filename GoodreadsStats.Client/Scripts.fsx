@@ -41,8 +41,8 @@ let getLoggedUserName accessToken accessTokenSecret =
     ajax url (string >> saveUserName) |> ignore
 
 let login accessToken accessTokenSecret=
-    downloadBasicStats accessToken accessTokenSecret
     getLoggedUserName accessToken accessTokenSecret
+    downloadBasicStats accessToken accessTokenSecret
     Redux.dispatch store (Login (accessToken, accessTokenSecret))
 let token = getQueryVariable "oauth_token"
 let secret = Globals.cookies.get ("authorizationTokenSecret")
@@ -52,9 +52,7 @@ match token with
     ajax url (string
                 >> parseTokenAndSecret
                 >> saveAccessToken
-                >> (fun (accessToken, accessTokenSecret) ->
-                    downloadBasicStats accessToken accessTokenSecret
-                    Redux.dispatch store (Login (accessToken, accessTokenSecret)) ))
+                >> (fun (accessToken, accessTokenSecret) -> login accessToken accessTokenSecret))
 | None -> 
     let token = Globals.cookies.get ("accessToken")
     match token with
