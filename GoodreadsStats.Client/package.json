@@ -27,6 +27,6 @@
         "fable-react": "^0.7.11"
     },
     "engines": {
-        "fable": "^0.7.14"
+        "fable": "^0.7.17"
     }
 }
