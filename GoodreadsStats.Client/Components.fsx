@@ -183,7 +183,7 @@ type Navigation(props) as this =
 
         let showLogoutButton = 
             if this.props.Logged then 
-                R.li [] [ R.a [ Href "#logout"; OnClick logout] [unbox (this.props.LoggedUserName + " (Logout)")]]
+                R.li [] [ R.a [ ClassName "logout-button"; Href "#logout"; OnClick logout] [unbox (this.props.LoggedUserName + " (Logout)")]]
                 else unbox " "
 
         R.nav [Id "mainNav" ; ClassName "navbar navbar-default navbar-custom navbar-fixed-top affix-top"] [
