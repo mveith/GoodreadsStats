@@ -51,7 +51,7 @@ type AccessTokenData =
       accessTokenSecret : string }
 
 type Action =
-    | Login of string * string
+    | Login of string * string * string
     | SaveBasicStats of BasicStats
     | SaveLoggedUserName of string
 
@@ -225,6 +225,7 @@ type App(props) as this =
     let logout()= 
         removeCookie "accessToken"
         removeCookie "accessTokenSecret"
+        removeCookie "userName"
         navigateTo "/"
         
     member x.render() =

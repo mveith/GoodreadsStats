@@ -24,4 +24,5 @@ type AuthorizationUserData =
 
 type LoggedUserData = 
     { AccessToken : string
-      AccessTokenSecret : string }
+      AccessTokenSecret : string
+      UserName : string}

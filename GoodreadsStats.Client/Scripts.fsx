@@ -15,13 +15,13 @@ open GoodreadsStats.Model
 module R = Fable.Helpers.React
 
 let reducer (state: State) = function
-    | Login (token, secret)-> { state with Logged = true; AccessData = Some { accessToken = token; accessTokenSecret = secret  }}
+    | Login (token, secret, userName)-> { state with Logged = true; AccessData = Some { accessToken = token; accessTokenSecret = secret  }; LoggedUserName = userName}
     | SaveBasicStats stats -> { state with BasicStats = Some stats}
-    | SaveLoggedUserName name -> { state with LoggedUserName = name}
 
 let saveAccessToken (userData:LoggedUserData) = 
     setCookie "accessToken" userData.AccessToken 7
     setCookie "accessTokenSecret" userData.AccessTokenSecret 7
+    setCookie "userName" userData.UserName 7
     userData
 
 let store = Redux.createStore reducer {Logged = false; BasicStats = None; AccessData = None; LoggedUserName = "" }
@@ -36,15 +36,9 @@ let downloadBasicStats accessToken accessTokenSecret =
     let url = completeUrlWithToken "basicStats" accessToken accessTokenSecret
     ajax url (string >> JS.JSON.parse >> unbox >> saveStats) |> ignore
 
-let getLoggedUserName accessToken accessTokenSecret =
-    let saveUserName name= Redux.dispatch store (SaveLoggedUserName name) 
-    let url = completeUrlWithToken "userName" accessToken accessTokenSecret
-    ajax url (string >> saveUserName) |> ignore
-
-let login accessToken accessTokenSecret=
-    getLoggedUserName accessToken accessTokenSecret
+let login accessToken accessTokenSecret userName=
     downloadBasicStats accessToken accessTokenSecret
-    Redux.dispatch store (Login (accessToken, accessTokenSecret))
+    Redux.dispatch store (Login (accessToken, accessTokenSecret, userName))
 let token = getQueryVariable "oauth_token"
 let secret = Globals.cookies.get ("authorizationTokenSecret")
 match token with
@@ -54,11 +48,12 @@ match token with
                 >> JS.JSON.parse 
                 >> unbox
                 >> saveAccessToken
-                >> (fun userData -> login userData.AccessToken userData.AccessTokenSecret))
+                >> (fun userData -> login userData.AccessToken userData.AccessTokenSecret userData.UserName))
 | None -> 
     let token = Globals.cookies.get ("accessToken")
     match token with
     | Some token -> 
         let secret = Globals.cookies.get ("accessTokenSecret")
-        login token secret.Value
+        let userName = Globals.cookies.get ("userName")
+        login token secret.Value userName.Value
     | None -> ()
