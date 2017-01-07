@@ -3,7 +3,7 @@
 type Book = 
     { Title : string
       Author : string }
-      
+
 type BookData = 
     { Book : Book
       PagesCount : int
@@ -16,3 +16,12 @@ type BasicStats =
       FastestBook : BookData
       AverageSpeed : double
       AveragePagesCount : double }
+      
+type AuthorizationUserData = 
+    { Token : string
+      TokenSecret : string
+      Url : string }
+
+type LoggedUserData = 
+    { AccessToken : string
+      AccessTokenSecret : string }

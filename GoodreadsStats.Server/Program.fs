@@ -6,6 +6,7 @@ open Suave.Operators
 open Suave.Successful
 open FSharp.Configuration
 open BasicStatsCalculator
+open GoodreadsStats.Model
 
 type Settings = AppSettings< "app.config" >
 
@@ -15,8 +16,7 @@ let clientSideUrl = "http://localhost:1234"
 
 let authorized token tokenSecret = 
     let (token, tokenSecret) = getAccessToken clientKey clientSecret token tokenSecret
-    let result = sprintf "%s|%s" token tokenSecret
-    OK result
+    json { AccessToken = token; AccessTokenSecret = tokenSecret }
 
 let reviews accessData = 
     let user = getUser accessData
@@ -50,7 +50,7 @@ let requestWithTokenParams f = request (processRequestWithTokenParams f)
 
 let authorizationUrlRequest request = 
     let (authorizationUrl, token, tokenSecret) = getAuthorizationData clientKey clientSecret clientSideUrl
-    OK(sprintf "%s|%s|%s" token tokenSecret authorizationUrl)
+    json { Token = token; TokenSecret = tokenSecret; Url = authorizationUrl}
 
 let webPart = 
     choose [ GET >=> choose [ path "/authorizationUrl" >=> setCORSHeaders >=> request authorizationUrlRequest

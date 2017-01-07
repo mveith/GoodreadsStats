@@ -1,6 +1,7 @@
 ﻿#r "node_modules/fable-core/Fable.Core.dll"
 #r "node_modules/fable-powerpack/Fable.PowerPack.dll"
 #r "node_modules/fable-react/Fable.React.dll"
+#load "../GoodreadsStats.Model/Model.fs"
 #load "Fable.Import.Global.fsx"
 #load "Utils.fsx"
 #load "Components.fsx"
@@ -9,6 +10,7 @@ open Fable.Import
 open Fable.Import.Global
 open Components
 open Utils
+open GoodreadsStats.Model
 
 module R = Fable.Helpers.React
 
@@ -17,11 +19,10 @@ let reducer (state: State) = function
     | SaveBasicStats stats -> { state with BasicStats = Some stats}
     | SaveLoggedUserName name -> { state with LoggedUserName = name}
 
-let saveAccessToken (accessToken, accessTokenSecret) = 
-    let accessToken = string accessToken
-    setCookie "accessToken" accessToken 7
-    setCookie "accessTokenSecret" accessTokenSecret 7
-    (accessToken, accessTokenSecret)
+let saveAccessToken (userData:LoggedUserData) = 
+    setCookie "accessToken" userData.AccessToken 7
+    setCookie "accessTokenSecret" userData.AccessTokenSecret 7
+    userData
 
 let store = Redux.createStore reducer {Logged = false; BasicStats = None; AccessData = None; LoggedUserName = "" }
 
@@ -50,9 +51,10 @@ match token with
 | Some token -> 
     let url = completeUrlWithToken "authorized" token secret.Value
     ajax url (string
-                >> parseTokenAndSecret
+                >> JS.JSON.parse 
+                >> unbox
                 >> saveAccessToken
-                >> (fun (accessToken, accessTokenSecret) -> login accessToken accessTokenSecret))
+                >> (fun userData -> login userData.AccessToken userData.AccessTokenSecret))
 | None -> 
     let token = Globals.cookies.get ("accessToken")
     match token with

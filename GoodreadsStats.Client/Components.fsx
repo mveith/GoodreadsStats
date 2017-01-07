@@ -211,14 +211,15 @@ type App(props) as this =
     do base.setInitState(getState())
     do Redux.subscribe this.props.Store (getState >> this.setState)
 
-    let saveAndReturnAuthorizationUrl result = 
-        let (token, secret, url) = parseTokenAndSecretAndUrl result
-        setCookie "authorizationToken" token 1
-        setCookie "authorizationTokenSecret" secret 1
-        url
+    let saveAndReturnAuthorizationUrl (authData: AuthorizationUserData) =
+        setCookie "authorizationToken" authData.Token 1
+        setCookie "authorizationTokenSecret" authData.TokenSecret 1
+        authData.Url
 
     let login()= 
         ajax (completeUrl "authorizationUrl") (string
+                                           >> JS.JSON.parse 
+                                           >> unbox
                                            >> saveAndReturnAuthorizationUrl
                                            >> navigateTo)
     let logout()= 

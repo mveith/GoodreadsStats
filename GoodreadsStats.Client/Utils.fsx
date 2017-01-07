@@ -28,10 +28,3 @@ let getQueryVariable variable =
     |> Seq.tryHead        
 
 let navigateTo url = window.location.href <- url
-
-let parseTokenAndSecret (result : string) = 
-    let parts = result.Split([| "|" |], System.StringSplitOptions.RemoveEmptyEntries)
-    (parts.[0], parts.[1])
-let parseTokenAndSecretAndUrl (result : string) = 
-    let parts = result.Split([| "|" |], System.StringSplitOptions.RemoveEmptyEntries)
-    (parts.[0], parts.[1], parts.[2])
