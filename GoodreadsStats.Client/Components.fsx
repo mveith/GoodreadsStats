@@ -53,6 +53,7 @@ type AccessTokenData =
 type Action =
     | Login of string * string
     | SaveBasicStats of BasicStats
+    | SaveLoggedUserName of string
 
 [<Pojo>]
 type BasicStatsTableProps = { BasicStats :BasicStats }
@@ -165,7 +166,7 @@ type Header(props) as this =
                     showStatsButton]]]
 
 [<Pojo>]
-type NavigationProps = {Logged:bool }
+type NavigationProps = {Logged:bool; LoggedUserName:string; }
 
 type Navigation(props) as this = 
     inherit React.Component<NavigationProps, obj>(props)
@@ -177,6 +178,11 @@ type Navigation(props) as this =
                 R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]
                 else unbox " " 
 
+        let showLogoutButton = 
+            if this.props.Logged then 
+                R.li [] [ R.a [ Href "#logout"] [unbox (this.props.LoggedUserName + " (Logout)")]]
+                else unbox " "
+
         R.nav [Id "mainNav" ; ClassName "navbar navbar-default navbar-custom navbar-fixed-top affix-top"] [
             R.div [ClassName "container"] [
                 R.div [ClassName "navbar-header page-scroll"] [
@@ -184,9 +190,10 @@ type Navigation(props) as this =
                 R.div [] [
                     R.ul [ClassName "nav navbar-nav navbar-right"] [
                         R.li [ClassName "hidden"] [ R.a [Href "#page-top"] []]
-                        showBasicStatsButton]]]]
+                        showBasicStatsButton
+                        showLogoutButton ]]]]
 
-type State =  { Logged:bool; BasicStats: BasicStats option; AccessData : AccessTokenData option;}
+type State =  { Logged:bool; BasicStats: BasicStats option; AccessData : AccessTokenData option; LoggedUserName:string; }
 [<Pojo>]
 type AppState = {State : State; Dispatch : Action -> unit }
 [<Pojo>]
@@ -215,7 +222,7 @@ type App(props) as this =
     member x.render() =
         let state = getState().State
         R.div [] [
-            R.com<Navigation, _, _> {Logged = state.Logged} []
+            R.com<Navigation, _, _> {Logged = state.Logged; LoggedUserName = state.LoggedUserName} []
             R.com<Header, _, _> { OnLogin = login; Logged = state.Logged } []
             R.com<BasicStatsSection, _, _> {Stats =  state.BasicStats; Logged = state.Logged} []            
             R.com<Footer, _, _> [] []

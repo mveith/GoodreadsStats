@@ -15,6 +15,7 @@ module R = Fable.Helpers.React
 let reducer (state: State) = function
     | Login (token, secret)-> { state with Logged = true; AccessData = Some { accessToken = token; accessTokenSecret = secret  }}
     | SaveBasicStats stats -> { state with BasicStats = Some stats}
+    | SaveLoggedUserName name -> { state with LoggedUserName = name}
 
 let saveAccessToken (accessToken, accessTokenSecret) = 
     let accessToken = string accessToken
@@ -22,7 +23,7 @@ let saveAccessToken (accessToken, accessTokenSecret) =
     setCookie "accessTokenSecret" accessTokenSecret 7
     (accessToken, accessTokenSecret)
 
-let store = Redux.createStore reducer {Logged = false; BasicStats = None; AccessData = None }
+let store = Redux.createStore reducer {Logged = false; BasicStats = None; AccessData = None; LoggedUserName = "" }
 
 ReactDom.render(
     R.com<App,_,_> { Store=store } [],
@@ -34,8 +35,14 @@ let downloadBasicStats accessToken accessTokenSecret =
     let url = completeUrlWithToken "basicStats" accessToken accessTokenSecret
     ajax url (string >> JS.JSON.parse >> unbox >> saveStats) |> ignore
 
+let getLoggedUserName accessToken accessTokenSecret =
+    let saveUserName name= Redux.dispatch store (SaveLoggedUserName name) 
+    let url = completeUrlWithToken "userName" accessToken accessTokenSecret
+    ajax url (string >> saveUserName) |> ignore
+
 let login accessToken accessTokenSecret=
     downloadBasicStats accessToken accessTokenSecret
+    getLoggedUserName accessToken accessTokenSecret
     Redux.dispatch store (Login (accessToken, accessTokenSecret))
 let token = getQueryVariable "oauth_token"
 let secret = Globals.cookies.get ("authorizationTokenSecret")

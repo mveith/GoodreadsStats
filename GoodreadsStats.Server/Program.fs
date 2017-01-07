@@ -19,8 +19,8 @@ let authorized token tokenSecret =
     OK result
 
 let reviews accessData = 
-    let userId = getUserId accessData
-    getAllReviews accessData userId "read" "date_read"
+    let user = getUser accessData
+    getAllReviews accessData user.Id "read" "date_read"
 
 let createBook (r : Reviews.Review) = 
     { ReadAt = parseOptionDate r.ReadAt
@@ -40,6 +40,11 @@ let basicStats token tokenSecret =
         |> Seq.toArray
     json (basicStats readBooks)
 
+let userName token tokenSecret = 
+    let accessData = getAccessData clientKey clientSecret token tokenSecret
+    let user = getUser accessData
+    OK user.Name
+
 let setCORSHeaders = setCORSHeaders clientSideUrl
 let requestWithTokenParams f = request (processRequestWithTokenParams f)
 
@@ -50,6 +55,7 @@ let authorizationUrlRequest request =
 let webPart = 
     choose [ GET >=> choose [ path "/authorizationUrl" >=> setCORSHeaders >=> request authorizationUrlRequest
                               pathStarts "/authorized" >=> setCORSHeaders >=> requestWithTokenParams authorized
-                              pathStarts "/basicStats" >=> setCORSHeaders >=> requestWithTokenParams basicStats ] ]
+                              pathStarts "/basicStats" >=> setCORSHeaders >=> requestWithTokenParams basicStats
+                              pathStarts "/userName" >=> setCORSHeaders >=> requestWithTokenParams userName ] ]
 
 startWebServer defaultConfig webPart

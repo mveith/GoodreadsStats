@@ -21,10 +21,10 @@ let getAccessToken clientKey clientSecret token tokenSecret =
 let getAccessData clientKey clientSecret token tokenSecret =
     getAccessData clientKey clientSecret token tokenSecret
         
-let getUserId accessData = 
+let getUser accessData = 
     let userResponse = getUrlContentWithAccessData "https://www.goodreads.com/api/auth_user" accessData
     let user = User.Parse userResponse
-    user.User.Id
+    user.User
 
 let getReviewsOnPage accessData userId shelf sort perPage pageNumber = 
     let url = 
