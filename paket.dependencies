@@ -6,3 +6,4 @@ nuget FSharp.Data
 nuget FSharp.Configuration
 nuget Newtonsoft.Json
 nuget NUnit
+nuget mveith.OAuth

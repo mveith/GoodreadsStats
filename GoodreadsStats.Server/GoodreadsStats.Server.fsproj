@@ -84,11 +84,6 @@
       <Project>{f759bca9-9f6c-431b-986b-524160306fef}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\OAuth\OAuth.fsproj">
-      <Name>OAuth</Name>
-      <Project>{7a00d019-56fd-4c37-a521-7cbf7ad56397}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <Choose>
@@ -110,12 +105,12 @@
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.0' Or $(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
       <ItemGroup>
+        <Reference Include="System.Xml.Linq">
+          <Paket>True</Paket>
+        </Reference>
         <Reference Include="FSharp.Data">
           <HintPath>..\packages\FSharp.Data\lib\net40\FSharp.Data.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
-        </Reference>
-        <Reference Include="System.Xml.Linq">
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
@@ -154,6 +149,17 @@
         <Reference Include="Microsoft.CSharp">
           <HintPath>..\packages\Microsoft.CSharp\ref\netstandard1.0\Microsoft.CSharp.dll</HintPath>
           <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
+      <ItemGroup>
+        <Reference Include="OAuth">
+          <HintPath>..\packages\mveith.OAuth\lib\net46\OAuth.dll</HintPath>
+          <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
