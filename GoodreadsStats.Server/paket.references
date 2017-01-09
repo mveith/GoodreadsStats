@@ -1,5 +1,4 @@
 Suave
-FSharp.Data
 FSharp.Configuration
 Newtonsoft.Json
-mveith.OAuth
+mveith.GoodreadsApi

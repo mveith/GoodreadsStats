@@ -24,6 +24,9 @@ NUGET
       System.Threading (>= 4.3) - framework: dnxcore50, >= netstandard13
     Microsoft.NETCore.Platforms (1.1) - framework: >= netstandard10
     Microsoft.NETCore.Targets (1.1) - framework: >= netstandard10
+    mveith.GoodreadsApi (0.2)
+      FSharp.Data (>= 2.3.2)
+      mveith.OAuth (>= 1.0)
     mveith.OAuth (1.0)
     Newtonsoft.Json (9.0.1)
       Microsoft.CSharp (>= 4.0.1) - framework: >= netstandard10

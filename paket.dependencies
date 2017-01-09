@@ -2,8 +2,7 @@ source https://nuget.org/api/v2
 
 nuget Suave
 nuget FAKE
-nuget FSharp.Data
 nuget FSharp.Configuration
 nuget Newtonsoft.Json
 nuget NUnit
-nuget mveith.OAuth
+nuget mveith.GoodreadsApi

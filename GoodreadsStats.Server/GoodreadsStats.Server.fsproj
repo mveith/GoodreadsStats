@@ -64,9 +64,6 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
-    <Content Include="userSample.xml" />
-    <Content Include="reviewsSample.xml" />
-    <Compile Include="GoodreadsApi.fs" />
     <Compile Include="BasicStatsCalculator.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Program.fs" />
@@ -149,6 +146,17 @@
         <Reference Include="Microsoft.CSharp">
           <HintPath>..\packages\Microsoft.CSharp\ref\netstandard1.0\Microsoft.CSharp.dll</HintPath>
           <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
+      <ItemGroup>
+        <Reference Include="GoodreadsApi">
+          <HintPath>..\packages\mveith.GoodreadsApi\lib\net46\GoodreadsApi.dll</HintPath>
+          <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
