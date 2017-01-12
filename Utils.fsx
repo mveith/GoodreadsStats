@@ -5,7 +5,7 @@ open Fable.Import
 open Fable.Import.Browser
 open Fable.Import.Global
 
-let serverUrl = "http://localhost:8083/"
+let serverUrl = "https://goodreadsstatsbackend.azurewebsites.net/api/"
 let completeUrl methodName = serverUrl + methodName
 
 let completeUrlWithToken methodName token tokenSecret = 
