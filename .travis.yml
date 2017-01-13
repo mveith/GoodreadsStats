@@ -1,0 +1,9 @@
+language: csharp
+
+before_script:
+ - nvm install 4.4
+ - nvm use 4.4 
+ - npm install
+
+script:
+ - fable ./Scripts.fsx
