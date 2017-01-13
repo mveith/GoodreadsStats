@@ -2,7 +2,7 @@
 #r "node_modules/fable-powerpack/Fable.PowerPack.dll"
 #r "node_modules/fable-react/Fable.React.dll"
 #load "Fable.Import.Global.fsx"
-#load "../GoodreadsStatsFunctions/Model.fsx"
+#load "Model.fsx"
 #load "Utils.fsx"
 module Redux =
     open System
