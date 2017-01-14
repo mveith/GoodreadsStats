@@ -1,0 +1,13 @@
+{
+    "version": "0.1.0",
+    "command": "cmd",
+    "isShellCommand": true,
+    "args": ["/C"],
+    "showOutput": "always",
+    "suppressTaskName": true,
+    "tasks": [{
+        "taskName": "build",
+        "isBuildCommand": true,
+        "args": ["fable ./Scripts.fsx"]
+    }]
+}
