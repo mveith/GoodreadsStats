@@ -2,7 +2,7 @@
     "sourceMaps": true,
     "projFile": "Scripts.fsx",
     "rollup": {
-        "dest": "./scripts/bundle.js",
+        "dest": "./app/app.js",
         "external": ["react", "react-dom", "redux"],
         "globals": {
             "react": "React",
