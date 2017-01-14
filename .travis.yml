@@ -5,5 +5,13 @@ before_script:
  - nvm use 4.4 
  - npm install
 
+before_deploy:
+ - rm .gitignore
+ - rm -rf ./node_modules/fable-compiler
+
+deploy:
+  provider: azure_web_apps
+  skip_cleanup: true
+
 script:
  - fable ./Scripts.fsx
