@@ -12,6 +12,10 @@ let completeUrlWithToken methodName token tokenSecret =
     let query = sprintf "?token=%s&tokenSecret=%s" token tokenSecret
     (completeUrl methodName) + query
 
+let completeUrlWithClientUrl methodName =
+    let query = sprintf "?clientSideUrl=%s" window.location.origin
+    (completeUrl methodName) + query
+
 let keyValuePair (var : string) =
     let parts = var.Split '='    
     match parts with

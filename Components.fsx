@@ -217,7 +217,7 @@ type App(props) as this =
         authData.Url
 
     let login()= 
-        ajax (completeUrl "authorizationUrl") (string
+        ajax (completeUrlWithClientUrl "authorizationUrl") (string
                                            >> JS.JSON.parse 
                                            >> unbox
                                            >> saveAndReturnAuthorizationUrl
