@@ -48,7 +48,8 @@ match token with
                 >> JS.JSON.parse 
                 >> unbox
                 >> saveAccessToken
-                >> (fun userData -> login userData.AccessToken userData.AccessTokenSecret userData.UserName))
+                >> (fun userData -> login userData.AccessToken userData.AccessTokenSecret userData.UserName)
+                >> removeTokenFromLocation)
 | None -> 
     let token = Globals.cookies.get ("accessToken")
     match token with

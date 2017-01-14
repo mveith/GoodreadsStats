@@ -32,3 +32,7 @@ let getQueryVariable variable =
     |> Seq.tryHead        
 
 let navigateTo url = window.location.href <- url
+
+let removeTokenFromLocation() =
+    let currentState = window.history.state
+    window.history.replaceState(currentState, "", window.location.origin)
