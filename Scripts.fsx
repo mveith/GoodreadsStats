@@ -43,7 +43,7 @@ let token = getQueryVariable "oauth_token"
 let secret = Globals.cookies.get ("authorizationTokenSecret")
 match token with
 | Some token -> 
-    let url = completeUrlWithToken "authorized" token secret.Value
+    let url = completeUrlWithToken "authenticate" token secret.Value
     ajax url (string
                 >> JS.JSON.parse 
                 >> unbox
