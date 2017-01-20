@@ -4,6 +4,7 @@
 #load "Fable.Import.Global.fsx"
 #load "Model.fsx"
 #load "Utils.fsx"
+#load "BasicStatsCalculator.fsx"
 module Redux =
     open System
     open Fable.Import
@@ -44,6 +45,7 @@ open Fable.Core
 open Fable.Import
 module R = Fable.Helpers.React
 open R.Props
+open BasicStatsCalculator
 
 [<Pojo>]
 type AccessTokenData = 
@@ -52,7 +54,7 @@ type AccessTokenData =
 
 type Action =
     | Login of string * string * string
-    | SaveBasicStats of BasicStats
+    | SaveReadBooks of ReadBook[]
 
 [<Pojo>]
 type BasicStatsTableProps = { BasicStats :BasicStats }
@@ -67,7 +69,7 @@ type BasicStatsTable(props) as this =
             R.i [ ClassName "fa fa-circle fa-stack-2x text-primary"] []
             R.i [ ClassName iconStyle] []]
 
-    let bookDescription (book : BookData) = 
+    let bookDescription (book : BookStatsData) = 
         [ 
             R.span [] [ R.b [] [unbox book.Book.Title ]]
             R.br [] []
@@ -95,16 +97,18 @@ type BasicStatsTable(props) as this =
 
 
 [<Pojo>]
-type BasicStatsSectionState={Stats : BasicStats option; Logged:bool}
+type BasicStatsSectionState={ReadBooks : ReadBook[]; Logged:bool}
 
 type BasicStatsSection(props) as this = 
     inherit React.Component<BasicStatsSectionState, obj>(props)
     do base.setInitState ([])
 
-    let statsTable stats=
-        match stats with
-        | Some stats -> R.com<BasicStatsTable, _, _> {BasicStats = stats} []
-        | None -> R.div [ ClassName "row text-center"] [ unbox "Building stats..."]
+    let statsTable readBooks=
+        match readBooks with
+        | [||] -> R.div [ ClassName "row text-center"] [ unbox "Building stats..."]
+        | readBooks -> 
+            let stats = basicStats readBooks
+            R.com<BasicStatsTable, _, _> {BasicStats = stats} []
 
     member x.render() =
         if this.props.Logged
@@ -115,7 +119,8 @@ type BasicStatsSection(props) as this =
                         R.div [ClassName "col-lg-12 text-center"] [
                             R.h2 [ClassName "section-heading"] [ unbox "Basic statistics"]
                             R.h3 [ClassName "section-subheading text-muted"] [ unbox "Basic statistics for read books."] ] ]
-                    statsTable this.props.Stats ] ]
+                    statsTable this.props.ReadBooks
+                    ] ]
         else R.div [] []
 
 
@@ -195,7 +200,8 @@ type Navigation(props) as this =
                         showBasicStatsButton
                         showLogoutButton ]]]]
 
-type State =  { Logged:bool; BasicStats: BasicStats option; AccessData : AccessTokenData option; LoggedUserName:string; }
+type State =  { Logged:bool; ReadBooks: ReadBook[]; AccessData : AccessTokenData option; LoggedUserName:string; }
+
 [<Pojo>]
 type AppState = {State : State; Dispatch : Action -> unit }
 [<Pojo>]
@@ -217,8 +223,7 @@ type App(props) as this =
 
     let login()= 
         ajax (completeUrlWithClientUrl "authorizationUrl") (string
-                                           >> JS.JSON.parse 
-                                           >> unbox
+                                           >> Fable.Core.JsInterop.ofJson
                                            >> saveAndReturnAuthorizationUrl
                                            >> navigateTo)
     let logout()= 
@@ -232,6 +237,6 @@ type App(props) as this =
         R.div [] [
             R.com<Navigation, _, _> {Logged = state.Logged; LoggedUserName = state.LoggedUserName; OnLogout = logout} []
             R.com<Header, _, _> { OnLogin = login; Logged = state.Logged } []
-            R.com<BasicStatsSection, _, _> {Stats =  state.BasicStats; Logged = state.Logged} []            
+            R.com<BasicStatsSection, _, _> {ReadBooks =  state.ReadBooks; Logged = state.Logged} []            
             R.com<Footer, _, _> [] []
         ]

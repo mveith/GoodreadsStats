@@ -1,10 +1,12 @@
 ﻿namespace GoodreadsStats.Model
 
+open System
+
 type Book = 
     { Title : string
       Author : string }
 
-type BookData = 
+type BookStatsData = 
     { Book : Book
       PagesCount : int
       DaysCount : int }
@@ -12,8 +14,8 @@ type BookData =
 type BasicStats = 
     { BooksCount : int
       PagesCount : int
-      SlowestBook : BookData
-      FastestBook : BookData
+      SlowestBook : BookStatsData
+      FastestBook : BookStatsData
       AverageSpeed : double
       AveragePagesCount : double }
       
@@ -26,3 +28,13 @@ type LoggedUserData =
     { AccessToken : string
       AccessTokenSecret : string
       UserName : string}
+
+type ReadData=
+    { ReadAt : DateTime
+      StartedAt : DateTime}
+
+type ReadBook = 
+    { ReadData : ReadData option
+      NumPages : int
+      BookTitle : string
+      AuthorName : string}
