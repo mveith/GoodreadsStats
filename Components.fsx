@@ -53,7 +53,6 @@ type AccessTokenData =
 type Action =
     | Login of string * string * string
     | SaveBasicStats of BasicStats
-    | SaveLoggedUserName of string
 
 [<Pojo>]
 type BasicStatsTableProps = { BasicStats :BasicStats }
