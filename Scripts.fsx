@@ -24,7 +24,19 @@ let saveAccessToken (userData:LoggedUserData) =
     setCookie "userName" userData.UserName 7
     userData
 
-let store = Redux.createStore reducer {Logged = false; ReadBooks = [||]; AccessData = None; LoggedUserName = "" }
+let load<'T> key =
+    Browser.localStorage.getItem(key) |> unbox |> Fable.Core.JsInterop.ofJson
+
+let save key (data: 'T) =
+    Browser.localStorage.setItem(key, Fable.Core.JsInterop.toJson data)
+
+let loadSavedBooks() = 
+    let savedBooks = load "readBooks" 
+    match savedBooks with
+    | Some savedBooks -> savedBooks
+    | None -> [||]
+
+let store = Redux.createStore reducer {Logged = false; ReadBooks = loadSavedBooks(); AccessData = None; LoggedUserName = "" }
 
 ReactDom.render(
     R.com<App,_,_> { Store=store } [],
@@ -32,7 +44,9 @@ ReactDom.render(
 ) |> ignore
 
 let getReadBooks accessToken accessTokenSecret =
-    let saveBooks books= Redux.dispatch store (SaveReadBooks books) 
+    let saveBooks books= 
+        Redux.dispatch store (SaveReadBooks books) 
+        save "readBooks"  books 
     let url = completeUrlWithToken "readBooks" accessToken accessTokenSecret
     ajax url (string >> Fable.Core.JsInterop.ofJson >> saveBooks) |> ignore
 
