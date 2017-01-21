@@ -5,12 +5,14 @@
 #load "Fable.Import.Global.fsx"
 #load "Utils.fsx"
 #load "Components.fsx"
+#load "ReadBooksStorage.fsx"
 
 open Fable.Import
 open Fable.Import.Global
 open Components
 open Utils
 open GoodreadsStats.Model
+open ReadBooksStorage
 
 module R = Fable.Helpers.React
 
@@ -24,14 +26,8 @@ let saveAccessToken (userData:LoggedUserData) =
     setCookie "userName" userData.UserName 7
     userData
 
-let load<'T> key =
-    Browser.localStorage.getItem(key) |> unbox |> Fable.Core.JsInterop.ofJson
-
-let save key (data: 'T) =
-    Browser.localStorage.setItem(key, Fable.Core.JsInterop.toJson data)
-
 let loadSavedBooks() = 
-    let savedBooks = load "readBooks" 
+    let savedBooks = ReadBooksStorage.load() 
     match savedBooks with
     | Some savedBooks -> savedBooks
     | None -> [||]
@@ -46,7 +42,7 @@ ReactDom.render(
 let getReadBooks accessToken accessTokenSecret =
     let saveBooks books= 
         Redux.dispatch store (SaveReadBooks books) 
-        save "readBooks"  books 
+        ReadBooksStorage.save books 
     let url = completeUrlWithToken "readBooks" accessToken accessTokenSecret
     ajax url (string >> Fable.Core.JsInterop.ofJson >> saveBooks) |> ignore
 
