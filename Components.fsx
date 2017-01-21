@@ -63,10 +63,10 @@ type BasicStatsTable(props) as this =
 
 
 [<Pojo>]
-type BasicStatsSectionState={ReadBooks : ReadBook[]; Logged:bool}
+type ReadBooksWrapper= { ReadBooks : ReadBook[] }
 
 type BasicStatsSection(props) as this = 
-    inherit React.Component<BasicStatsSectionState, obj>(props)
+    inherit React.Component<ReadBooksWrapper, obj>(props)
     do base.setInitState ([])
 
     let statsTable readBooks=
@@ -77,17 +77,14 @@ type BasicStatsSection(props) as this =
             R.com<BasicStatsTable, _, _> {BasicStats = stats} []
 
     member x.render() =
-        if this.props.Logged
-        then 
-            R.section [Id "basic-stats"] [
-                R.div [ClassName "container"] [
-                    R.div [ClassName "row"] [
-                        R.div [ClassName "col-lg-12 text-center"] [
-                            R.h2 [ClassName "section-heading"] [ unbox "Basic statistics"]
-                            R.h3 [ClassName "section-subheading text-muted"] [ unbox "Basic statistics for read books."] ] ]
-                    statsTable this.props.ReadBooks
-                    ] ]
-        else R.div [] []
+        R.section [Id "basic-stats"] [
+            R.div [ClassName "container"] [
+                R.div [ClassName "row"] [
+                    R.div [ClassName "col-lg-12 text-center"] [
+                        R.h2 [ClassName "section-heading"] [ unbox "Basic statistics"]
+                        R.h3 [ClassName "section-subheading text-muted"] [ unbox "Basic statistics for read books."] ] ]
+                statsTable this.props.ReadBooks
+                ] ]
 
 
 type Footer(props) as this = 
@@ -201,9 +198,12 @@ type App(props) as this =
         
     member x.render() =
         let state = getState().State
+        let statsComponents =
+            if state.Logged then [R.com<BasicStatsSection, _, _> {ReadBooks =  state.ReadBooks} []]
+            else []
         R.div [] [
             R.com<Navigation, _, _> {Logged = state.Logged; LoggedUserName = state.LoggedUserName; OnLogout = logout} []
             R.com<Header, _, _> { OnLogin = login; Logged = state.Logged } []
-            R.com<BasicStatsSection, _, _> {ReadBooks =  state.ReadBooks; Logged = state.Logged} []            
+            R.div [] statsComponents
             R.com<Footer, _, _> [] []
         ]
