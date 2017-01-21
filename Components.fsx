@@ -230,6 +230,7 @@ type App(props) as this =
         removeCookie "accessToken"
         removeCookie "accessTokenSecret"
         removeCookie "userName"
+        Browser.localStorage.removeItem "readBooks"
         navigateTo "/"
         
     member x.render() =
