@@ -133,7 +133,12 @@ type App(props) as this =
     member x.render() =
         let state = getState().State
         let statsComponents =
-            if state.Logged then [R.com<BasicStatsSection, _, _> {ReadBooks =  state.ReadBooks} []]
+            if state.Logged then 
+                let readBooksWrapper = {ReadBooksWrapper.ReadBooks =  state.ReadBooks}
+                [
+                    R.com<BasicStatsSection, _, _> readBooksWrapper []
+                    R.com<TopTenSection, _, _> readBooksWrapper []
+                ]
             else []
         R.div [] [
             R.com<Navigation, _, _> {Logged = state.Logged; LoggedUserName = state.LoggedUserName; OnLogout = logout} []

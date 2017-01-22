@@ -16,20 +16,13 @@ let bookSpeed book =
     let daysCount = (endDate - startDate).TotalDays + 1.0
     (float pagesCount) / daysCount
     
-let createBookData bookWithSpeed = 
-    match bookWithSpeed with
-    | Some(book, bookSpeed) -> 
-        { Book =  
-              { Title = book.BookTitle
-                Author = book.AuthorName }
-          PagesCount = book.NumPages
-          DaysCount = int ((float book.NumPages) / bookSpeed) }
-    | None -> 
-        { Book = 
-              { Title = ""
-                Author = "" }
-          PagesCount = 0
-          DaysCount = 0 }
+let createBookData (book, bookSpeed) = 
+    { Book =
+        { Title = book.BookTitle
+          Author = book.AuthorName }
+      PagesCount = book.NumPages
+      DaysCount = int ((float book.NumPages) / bookSpeed)
+      Speed = bookSpeed }
 
 let averageSpeed books =
     if (books |> Seq.isEmpty) then 0.0
@@ -48,16 +41,20 @@ let averageSpeed books =
         let daysCount = float (days |> Seq.length)
         pagesCount / daysCount
 
+let validBooks readBooks=
+    readBooks
+    |> Seq.filter isValidReadBook
+    |> Seq.toArray
+
+let booksSpeed (validBooks:ReadBook[])=
+    validBooks
+    |> Seq.map (fun r -> createBookData (r, bookSpeed r))
+    |> Seq.sortByDescending (fun b -> b.Speed)
+
 let basicStats (readBooks:ReadBook[]) = 
-    let validBooks = 
-        readBooks
-        |> Seq.filter isValidReadBook
-        |> Seq.toArray
+    let validBooks = validBooks readBooks
     
-    let booksSpeed = 
-        validBooks
-        |> Seq.map (fun r -> (r, bookSpeed r))
-        |> Seq.sortByDescending (fun (_, speed) -> speed)
+    let booksSpeed = booksSpeed validBooks
     
     let fastestBook = booksSpeed |> Seq.tryHead
     let slowestBook = booksSpeed |> Seq.tryLast
@@ -67,7 +64,7 @@ let basicStats (readBooks:ReadBook[]) =
         else validBooks |> Seq.averageBy (fun p -> double p.NumPages)
     { BooksCount = validBooks.Length
       PagesCount = validBooks |> Seq.sumBy (fun p -> p.NumPages)
-      SlowestBook = createBookData slowestBook
-      FastestBook = createBookData fastestBook
+      SlowestBook = slowestBook
+      FastestBook = fastestBook
       AverageSpeed = averageSpeed validBooks
       AveragePagesCount = averagePagesCount }

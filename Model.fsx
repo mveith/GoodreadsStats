@@ -9,13 +9,14 @@ type Book =
 type BookStatsData = 
     { Book : Book
       PagesCount : int
-      DaysCount : int }
+      DaysCount : int 
+      Speed : float}
 
 type BasicStats = 
     { BooksCount : int
       PagesCount : int
-      SlowestBook : BookStatsData
-      FastestBook : BookStatsData
+      SlowestBook : BookStatsData option
+      FastestBook : BookStatsData option
       AverageSpeed : double
       AveragePagesCount : double }
       
