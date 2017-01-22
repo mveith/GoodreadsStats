@@ -2,7 +2,7 @@
 #load "Model.fsx"
 
 open Fable.Import
-open GoodreadsStats.Model
+open Model
 
 let key = "readBooks"
 let load() : ReadBook[] option =

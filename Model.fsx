@@ -1,14 +1,17 @@
-﻿namespace GoodreadsStats.Model
+﻿open System
 
-open System
+type ReadData=
+    { ReadAt : DateTime
+      StartedAt : DateTime}
 
-type Book = 
-    { Title : string
-      Author : string }
+type ReadBook = 
+    { ReadData : ReadData option
+      NumPages : int
+      BookTitle : string
+      AuthorName : string}
 
 type BookStatsData = 
-    { Book : Book
-      PagesCount : int
+    { Book : ReadBook
       DaysCount : int 
       Speed : float}
 
@@ -29,13 +32,3 @@ type LoggedUserData =
     { AccessToken : string
       AccessTokenSecret : string
       UserName : string}
-
-type ReadData=
-    { ReadAt : DateTime
-      StartedAt : DateTime}
-
-type ReadBook = 
-    { ReadData : ReadData option
-      NumPages : int
-      BookTitle : string
-      AuthorName : string}

@@ -11,7 +11,7 @@ open Fable.Import
 open Fable.Import.Global
 open Components
 open Utils
-open GoodreadsStats.Model
+open Model
 open ReadBooksStorage
 
 module R = Fable.Helpers.React

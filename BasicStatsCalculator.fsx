@@ -2,7 +2,7 @@
 
 #load "Model.fsx"
 
-open GoodreadsStats.Model
+open Model
 open System
 
 let isValidReadBook book = 
@@ -17,10 +17,7 @@ let bookSpeed book =
     (float pagesCount) / daysCount
     
 let createBookData (book, bookSpeed) = 
-    { Book =
-        { Title = book.BookTitle
-          Author = book.AuthorName }
-      PagesCount = book.NumPages
+    { Book = book
       DaysCount = int ((float book.NumPages) / bookSpeed)
       Speed = bookSpeed }
 

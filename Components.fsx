@@ -5,7 +5,7 @@
 
 open Fable.Import.Global
 open Utils
-open GoodreadsStats.Model
+open Model
 open Fable.Core
 open Fable.Import
 module R = Fable.Helpers.React

@@ -2,7 +2,7 @@
 #r "node_modules/fable-react/Fable.React.dll"
 #load "BasicStatsCalculator.fsx"
 
-open GoodreadsStats.Model
+open Model
 open Fable.Core.JsInterop
 open Fable.Import
 module R = Fable.Helpers.React
@@ -27,13 +27,13 @@ type BasicStatsTable(props) as this =
         match book with
         | Some book ->
             [ 
-                R.span [] [ R.b [] [unbox book.Book.Title ]]
+                R.span [] [ R.b [] [unbox book.Book.BookTitle ]]
                 R.br [] []
                 R.i [] [ unbox "by" ]
                 R.br [] []
-                R.span [] [ unbox book.Book.Author ]
+                R.span [] [ unbox book.Book.AuthorName ]
                 R.br [] []
-                unbox (sprintf "(%.2f pages / day)" (float book.PagesCount / float book.DaysCount)) ] 
+                unbox (sprintf "(%.2f pages / day)" (float book.Book.NumPages / float book.DaysCount)) ] 
         | None -> []
 
     let valueBox label icon content=
@@ -79,13 +79,13 @@ type TopTenSection(props) as this =
     inherit React.Component<ReadBooksWrapper, obj>(props)
     do base.setInitState ([])
 
-    let getBookContent title author=
+    let getBookContent book=
         [
-            R.b [] [unbox title]
+            R.b [] [unbox book.BookTitle]
             R.br [] []
             R.i [] [ unbox "by" ]
             R.br [] []
-            R.span [] [ unbox author ]]
+            R.span [] [ unbox book.AuthorName ]]
 
     let table rows caption=
         let createRow rank rowContent value =
@@ -108,14 +108,14 @@ type TopTenSection(props) as this =
 
             let booksBySpeed= 
                 booksSpeed 
-                |> Seq.map (fun b -> (getBookContent b.Book.Title b.Book.Author, sprintf "%.2f pages / day" b.Speed)) 
+                |> Seq.map (fun b -> (getBookContent b.Book, sprintf "%.2f pages / day" b.Speed)) 
                 |> Seq.toList
 
             let booksByLength = 
                 readBooks 
                 |> Seq.filter (fun b -> b.NumPages > 0)
                 |> Seq.sortByDescending (fun b-> b.NumPages) 
-                |> Seq.map (fun b-> (getBookContent b.BookTitle b.AuthorName, sprintf "%i pages" b.NumPages)) 
+                |> Seq.map (fun b-> (getBookContent b, sprintf "%i pages" b.NumPages)) 
                 |> Seq.toList
 
             let booksByAuthors = 
