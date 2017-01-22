@@ -17,7 +17,6 @@ type BasicStatsTable(props) as this =
     inherit React.Component<BasicStatsTableProps, obj>(props)
     do base.setInitState([])
 
-
     let image icon =
         let iconStyle = sprintf "fa fa-%s fa-stack-1x fa-inverse" icon 
         R.span [ ClassName "fa-stack fa-4x"] [
@@ -74,8 +73,7 @@ type BasicStatsSection(props) as this =
                     R.div [ClassName "col-lg-12 text-center"] [
                         R.h2 [ClassName "section-heading"] [ unbox "Basic statistics"]
                         R.h3 [ClassName "section-subheading text-muted"] [ unbox "Basic statistics for read books."] ] ]
-                statsTable this.props.ReadBooks
-                ] ]
+                statsTable this.props.ReadBooks ]]
 
 type TopTenSection(props) as this = 
     inherit React.Component<ReadBooksWrapper, obj>(props)
@@ -89,15 +87,15 @@ type TopTenSection(props) as this =
             R.br [] []
             R.span [] [ unbox author ]]
 
-    let table rows caption units getElementContent=
-        let createRow rank element value =
+    let table rows caption=
+        let createRow rank rowContent value =
             R.tr [][
                     R.td [][ unbox rank]
-                    R.td [] (getElementContent element)
-                    R.td [][ unbox (sprintf "%.2f %s" value units)]]
+                    R.td [] rowContent
+                    R.td [][ unbox value]]
 
-        let rows = rows |> Seq.mapi (fun index (element, value)-> createRow (index + 1) element value) |> Seq.toList
-        R.div [ ClassName (sprintf "col-md-%i" 4) ] [            
+        let rows = rows |> Seq.mapi (fun index (rowContent, value)-> createRow (index + 1) rowContent value) |> Seq.toList
+        R.div [ ClassName "col-md-4" ] [            
             R.h4 [ ClassName "service-heading" ] [unbox caption]
             R.table [ClassName "table table-hover"] [ R.tbody [] rows]]
 
@@ -108,19 +106,24 @@ type TopTenSection(props) as this =
             let validBooks = validBooks readBooks
             let booksSpeed = booksSpeed validBooks
 
+            let booksBySpeed= 
+                booksSpeed |> Seq.map (fun b -> (getBookContent b.Book.Title b.Book.Author, sprintf "%.2f pages / day" b.Speed)) |> Seq.toList
+
+            let booksByLength = 
+                validBooks |> Seq.sortByDescending (fun b-> b.NumPages) |> Seq.map (fun b-> (getBookContent b.BookTitle b.AuthorName, sprintf "%i pages" b.NumPages)) |> Seq.toList
             R.div [] [
                 R.div [ ClassName "row text-center" ] [
-                        table (booksSpeed |> Seq.take 10 |> Seq.map (fun b -> (b.Book, b.Speed))) "Fastest books" "pages / day" (fun b-> getBookContent b.Title b.Author)
-                        table (booksSpeed |> Seq.toList |> List.rev |> Seq.take 10 |> Seq.map (fun b -> (b.Book, b.Speed))) "Slowest books" "pages / day" (fun b-> getBookContent b.Title b.Author)
-                        table (validBooks |> Seq.sortByDescending (fun b-> b.NumPages) |> Seq.take 10 |> Seq.map (fun b-> (b, float b.NumPages)))  "Longest books" "Pages" (fun b-> getBookContent b.BookTitle b.AuthorName)]
+                        table (booksBySpeed |> Seq.take 10) "Fastest books"
+                        table (booksBySpeed |> List.rev |> Seq.take 10) "Slowest books"
+                        table (booksByLength |> Seq.take 10)  "Longest books"]
                 R.div [ ClassName "row text-center" ] [
-                        table (validBooks |> Seq.sortBy (fun b-> b.NumPages) |> Seq.take 10 |> Seq.map (fun b-> (b, float b.NumPages)))  "Shortest books" "" (fun b-> getBookContent b.BookTitle b.AuthorName)
-                        table []  "Top authors" "" (fun _-> [])
-                        table []  "Top genres" "" (fun _-> [])]
+                        table (booksByLength |> List.rev |> Seq.take 10)  "Shortest books"
+                        table []  "Top authors"
+                        table []  "Top genres"]
                 R.div [ ClassName "row text-center" ] [
-                        table []  "Top shelves" "" (fun _-> [])
-                        table []  "Top period" "" (fun _-> [])
-                        table []  "Top original language" "" (fun _-> [])]]
+                        table []  "Top shelves"
+                        table []  "Top period"
+                        table []  "Top original language"]]
 
     member x.render() =
         R.section [Id "top-ten"] [
