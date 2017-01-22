@@ -77,25 +77,24 @@ type Navigation(props) as this =
         this.props.OnLogout()
 
     member x.render() =
-        let showBasicStatsButton = 
-            if this.props.Logged then 
-                R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]
-                else unbox " " 
+        let menuItems()=
+            let menuItemsForLoggedUser = 
+                if this.props.Logged then                
+                    [ R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]
+                      R.li [] [ R.a [ClassName "page-scroll"; Href "#top-ten"] [unbox "Top ten"]]
+                      R.li [] [ R.a [ ClassName "logout-button"; Href "#logout"; OnClick logout] [unbox (this.props.LoggedUserName + " (Logout)")]]]
+                else []
 
-        let showLogoutButton = 
-            if this.props.Logged then 
-                R.li [] [ R.a [ ClassName "logout-button"; Href "#logout"; OnClick logout] [unbox (this.props.LoggedUserName + " (Logout)")]]
-                else unbox " "
+            let topButton = R.li [ClassName "hidden"] [ R.a [Href "#page-top"] []]
+            topButton :: menuItemsForLoggedUser
+
 
         R.nav [Id "mainNav" ; ClassName "navbar navbar-default navbar-custom navbar-fixed-top affix-top"] [
             R.div [ClassName "container"] [
                 R.div [ClassName "navbar-header page-scroll"] [
                     R.a [ClassName "navbar-brand page-scroll"; Href "#page-top"] [unbox "Goodreads Statistics"]]
                 R.div [] [
-                    R.ul [ClassName "nav navbar-nav navbar-right"] [
-                        R.li [ClassName "hidden"] [ R.a [Href "#page-top"] []]
-                        showBasicStatsButton
-                        showLogoutButton ]]]]
+                    R.ul [ClassName "nav navbar-nav navbar-right"] (menuItems())]]]
 
 type State =  { Logged:bool; ReadBooks: ReadBook[]; AccessData : AccessTokenData option; LoggedUserName:string; }
 
