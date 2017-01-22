@@ -107,29 +107,37 @@ type TopTenSection(props) as this =
             let booksSpeed = booksSpeed validBooks
 
             let booksBySpeed= 
-                booksSpeed |> Seq.map (fun b -> (getBookContent b.Book.Title b.Book.Author, sprintf "%.2f pages / day" b.Speed)) |> Seq.toList
+                booksSpeed 
+                |> Seq.map (fun b -> (getBookContent b.Book.Title b.Book.Author, sprintf "%.2f pages / day" b.Speed)) 
+                |> Seq.toList
 
             let booksByLength = 
-                validBooks |> Seq.sortByDescending (fun b-> b.NumPages) |> Seq.map (fun b-> (getBookContent b.BookTitle b.AuthorName, sprintf "%i pages" b.NumPages)) |> Seq.toList
+                readBooks 
+                |> Seq.filter (fun b -> b.NumPages > 0)
+                |> Seq.sortByDescending (fun b-> b.NumPages) 
+                |> Seq.map (fun b-> (getBookContent b.BookTitle b.AuthorName, sprintf "%i pages" b.NumPages)) 
+                |> Seq.toList
+
             let booksByAuthors = 
                 readBooks 
                 |> Seq.groupBy (fun b-> b.AuthorName) 
                 |> Seq.sortByDescending (fun (key, values)-> values |> Seq.length) 
                 |> Seq.map (fun (authorName, books) -> ([ unbox authorName], sprintf "%i books" (books |> Seq.length)))
-                
+
             R.div [] [
                 R.div [ ClassName "row text-center" ] [
                         table (booksBySpeed |> Seq.take 10) "Fastest books"
                         table (booksBySpeed |> List.rev |> Seq.take 10) "Slowest books"
-                        table (booksByLength |> Seq.take 10)  "Longest books"]
+                        table (booksByLength |> Seq.take 10)  "Longest books*"]
                 R.div [ ClassName "row text-center" ] [
-                        table (booksByLength |> List.rev |> Seq.take 10)  "Shortest books"
-                        table (booksByAuthors |> Seq.take 10)  "Top authors"
-                        table []  "Top genres"]
+                        table (booksByLength |> List.rev |> Seq.take 10)  "Shortest books*"
+                        table (booksByAuthors |> Seq.take 10)  "Top authors*"
+                        table []  "Top genres*"]
                 R.div [ ClassName "row text-center" ] [
-                        table []  "Top shelves"
-                        table []  "Top period"
-                        table []  "Top original language"]]
+                        table []  "Top shelves*"
+                        table []  "Top period*"
+                        table []  "Top original language*"]
+                R.span [] [ R.i [] [ unbox (sprintf "* From all %i read books " readBooks.Length)]]]
 
     member x.render() =
         R.section [Id "top-ten"] [
