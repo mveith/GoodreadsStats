@@ -126,12 +126,12 @@ type TopTenSection(props) as this =
 
             R.div [] [
                 R.div [ ClassName "row text-center" ] [
-                        table (booksBySpeed |> Seq.take 10) "Fastest books"
-                        table (booksBySpeed |> List.rev |> Seq.take 10) "Slowest books"
-                        table (booksByLength |> Seq.take 10)  "Longest books*"]
+                        table (booksBySpeed |> Seq.truncate 10) "Fastest books"
+                        table (booksBySpeed |> List.rev |> Seq.truncate 10) "Slowest books"
+                        table (booksByLength |> Seq.truncate 10)  "Longest books*"]
                 R.div [ ClassName "row text-center" ] [
-                        table (booksByLength |> List.rev |> Seq.take 10)  "Shortest books*"
-                        table (booksByAuthors |> Seq.take 10)  "Top authors*"
+                        table (booksByLength |> List.rev |> Seq.truncate 10)  "Shortest books*"
+                        table (booksByAuthors |> Seq.truncate 10)  "Top authors*"
                         table []  "Top genres*"]
                 R.div [ ClassName "row text-center" ] [
                         table []  "Top shelves*"
