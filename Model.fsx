@@ -8,7 +8,8 @@ type ReadBook =
     { ReadData : ReadData option
       NumPages : int
       BookTitle : string
-      AuthorName : string}
+      AuthorName : string
+      ReviewId : int }
 
 type BookStatsData = 
     { Book : ReadBook

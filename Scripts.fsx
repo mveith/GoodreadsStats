@@ -16,9 +16,14 @@ open ReadBooksStorage
 
 module R = Fable.Helpers.React
 
+let saveReadBooks actualState books =
+    let readBooks = Array.concat [ actualState.ReadBooks ; books] |> Seq.groupBy (fun b -> b.ReviewId) |> Seq.map (fun (key, group)-> group |> Seq.last) |> Seq.toArray
+    ReadBooksStorage.save readBooks 
+    { actualState with ReadBooks = readBooks}
+
 let reducer (state: State) = function
     | Login (token, secret, userName)-> { state with Logged = true; AccessData = Some { accessToken = token; accessTokenSecret = secret  }; LoggedUserName = userName}
-    | SaveReadBooks books -> { state with ReadBooks = books}
+    | SaveReadBooks books -> saveReadBooks state books
 
 let saveAccessToken (userData:LoggedUserData) = 
     setCookie "accessToken" userData.AccessToken 7
@@ -40,13 +45,20 @@ ReactDom.render(
 ) |> ignore
 
 let getReadBooks accessToken accessTokenSecret =
-    let saveBooks books= 
-        Redux.dispatch store (SaveReadBooks books) 
-        ReadBooksStorage.save books 
-    let url = completeUrlWithToken "readBooks" accessToken accessTokenSecret
-    ajax url (string >> Fable.Core.JsInterop.ofJson >> saveBooks) |> ignore
+    let getReadBooks booksCount =
+        let booksPerPage = 10.0
+        let pagesCount = booksCount / booksPerPage |> System.Math.Ceiling |> int
 
-let login accessToken accessTokenSecret userName=
+        for i in 1..pagesCount do
+            let saveBooks books= 
+                Redux.dispatch store (SaveReadBooks books) 
+            let url = completeUrl (sprintf "readBooks?token=%s&tokenSecret=%s&perPage=%i&page=%i" accessToken accessTokenSecret (int booksPerPage) i)
+            ajax url (string >> Fable.Core.JsInterop.ofJson >> saveBooks) |> ignore
+
+    let readBooksCountUrl = completeUrlWithToken "readBooksCount" accessToken accessTokenSecret
+    ajax readBooksCountUrl (string >> float >> getReadBooks)
+
+let login accessToken accessTokenSecret userName =
     getReadBooks accessToken accessTokenSecret
     Redux.dispatch store (Login (accessToken, accessTokenSecret, userName))
 let token = getQueryVariable "oauth_token"
