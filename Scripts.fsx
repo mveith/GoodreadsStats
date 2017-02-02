@@ -8,6 +8,7 @@
 #load "Components.fsx"
 #load "ReadBooksStorage.fsx"
 #load "Reducer.fsx"
+#load "ReadBooksDownloader.fsx"
 
 open Fable.Import
 open Fable.Import.Global
@@ -17,6 +18,7 @@ open Model
 open ReadBooksStorage
 open Actions
 open Reducer
+open ReadBooksDownloader
 
 module R = Fable.Helpers.React
 
@@ -39,23 +41,12 @@ ReactDom.render(
     Browser.document.getElementById "content"
 ) |> ignore
 
-let getReadBooks accessToken accessTokenSecret =
-    let getReadBooks booksCount =
-        let booksPerPage = 10.0
-        let pagesCount = booksCount / booksPerPage |> System.Math.Ceiling |> int
-
-        for i in 1..pagesCount do
-            let saveBooks books= 
-                Redux.dispatch store (SaveReadBooks books) 
-            let url = completeUrl (sprintf "readBooks?token=%s&tokenSecret=%s&perPage=%i&page=%i" accessToken accessTokenSecret (int booksPerPage) i)
-            ajax url (string >> Fable.Core.JsInterop.ofJson >> saveBooks) |> ignore
-
-    let readBooksCountUrl = completeUrlWithToken "readBooksCount" accessToken accessTokenSecret
-    ajax readBooksCountUrl (string >> float >> getReadBooks)
+let saveBooks = SaveReadBooks >> Redux.dispatch store
 
 let login accessToken accessTokenSecret userName =
-    getReadBooks accessToken accessTokenSecret
+    startDownloadReadBooks accessToken accessTokenSecret saveBooks
     Redux.dispatch store (Login (accessToken, accessTokenSecret, userName))
+
 let token = getQueryVariable "oauth_token"
 let secret = Globals.cookies.get ("authorizationTokenSecret")
 match token with
