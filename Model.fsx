@@ -33,3 +33,13 @@ type LoggedUserData =
     { AccessToken : string
       AccessTokenSecret : string
       UserName : string}
+
+type AccessTokenData = 
+    { accessToken : string
+      accessTokenSecret : string }
+
+type State =
+    { Logged:bool
+      ReadBooks: ReadBook[] 
+      AccessData : AccessTokenData option
+      LoggedUserName:string }

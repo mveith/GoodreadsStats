@@ -2,8 +2,10 @@
 #load "Utils.fsx"
 #load "Fable.Import.Redux.fsx"
 #load "StatisticsComponents.fsx"
+#load "Actions.fsx"
 
 open Fable.Import.Global
+open Actions
 open Utils
 open Model
 open Fable.Core
@@ -11,15 +13,6 @@ open Fable.Import
 module R = Fable.Helpers.React
 open R.Props
 open StatisticsComponents
-
-[<Pojo>]
-type AccessTokenData = 
-    { accessToken : string
-      accessTokenSecret : string }
-
-type Action =
-    | Login of string * string * string
-    | SaveReadBooks of ReadBook[]
 
 type Footer(props) as this = 
     inherit React.Component<obj, obj>(props)
@@ -95,8 +88,6 @@ type Navigation(props) as this =
                     R.a [ClassName "navbar-brand page-scroll"; Href "#page-top"] [unbox "Goodreads Statistics"]]
                 R.div [] [
                     R.ul [ClassName "nav navbar-nav navbar-right"] (menuItems())]]]
-
-type State =  { Logged:bool; ReadBooks: ReadBook[]; AccessData : AccessTokenData option; LoggedUserName:string; }
 
 [<Pojo>]
 type AppState = {State : State; Dispatch : Action -> unit }

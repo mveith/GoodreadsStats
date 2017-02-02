@@ -2,10 +2,12 @@
 #r "node_modules/fable-powerpack/Fable.PowerPack.dll"
 #r "node_modules/fable-react/Fable.React.dll"
 #load "Model.fsx"
+#load "Actions.fsx"
 #load "Fable.Import.Global.fsx"
 #load "Utils.fsx"
 #load "Components.fsx"
 #load "ReadBooksStorage.fsx"
+#load "Reducer.fsx"
 
 open Fable.Import
 open Fable.Import.Global
@@ -13,17 +15,10 @@ open Components
 open Utils
 open Model
 open ReadBooksStorage
+open Actions
+open Reducer
 
 module R = Fable.Helpers.React
-
-let saveReadBooks actualState books =
-    let readBooks = Array.concat [ actualState.ReadBooks ; books] |> Seq.groupBy (fun b -> b.ReviewId) |> Seq.map (fun (key, group)-> group |> Seq.last) |> Seq.toArray
-    ReadBooksStorage.save readBooks 
-    { actualState with ReadBooks = readBooks}
-
-let reducer (state: State) = function
-    | Login (token, secret, userName)-> { state with Logged = true; AccessData = Some { accessToken = token; accessTokenSecret = secret  }; LoggedUserName = userName}
-    | SaveReadBooks books -> saveReadBooks state books
 
 let saveAccessToken (userData:LoggedUserData) = 
     setCookie "accessToken" userData.AccessToken 7
