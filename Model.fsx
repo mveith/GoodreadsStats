@@ -11,6 +11,10 @@ type ReadBook =
       AuthorName : string
       ReviewId : int }
 
+type BookDetail =
+    { Id : int
+      Shelves : string[] }
+
 type BookStatsData = 
     { Book : ReadBook
       DaysCount : int 
@@ -39,7 +43,8 @@ type AccessTokenData =
       accessTokenSecret : string }
 
 type State =
-    { Logged:bool
-      ReadBooks: ReadBook[] 
+    { Logged : bool
+      ReadBooks : ReadBook[] 
       AccessData : AccessTokenData option
-      LoggedUserName:string }
+      LoggedUserName:string 
+      BooksDetails : BookDetail[] }

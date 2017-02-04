@@ -124,7 +124,7 @@ type App(props) as this =
         let state = getState().State
         let statsComponents =
             if state.Logged then 
-                let readBooksWrapper = {ReadBooksWrapper.ReadBooks =  state.ReadBooks}
+                let readBooksWrapper = {ReadBooksWrapper.ReadBooks = state.ReadBooks; Details = state.BooksDetails}
                 [
                     R.com<BasicStatsSection, _, _> readBooksWrapper []
                     R.com<TopTenSection, _, _> readBooksWrapper []

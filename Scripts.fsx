@@ -34,7 +34,7 @@ let loadSavedBooks() =
     | Some savedBooks -> savedBooks
     | None -> [||]
 
-let store = Redux.createStore reducer {Logged = false; ReadBooks = loadSavedBooks(); AccessData = None; LoggedUserName = "" }
+let store = Redux.createStore reducer {Logged = false; ReadBooks = loadSavedBooks(); AccessData = None; LoggedUserName = ""; BooksDetails = [||] }
 
 ReactDom.render(
     R.com<App,_,_> { Store=store } [],
@@ -42,9 +42,10 @@ ReactDom.render(
 ) |> ignore
 
 let saveBooks = SaveReadBooks >> Redux.dispatch store
+let saveBookDetails = SaveBooksDetails >> Redux.dispatch store
 
 let login accessToken accessTokenSecret userName =
-    startDownloadReadBooks accessToken accessTokenSecret saveBooks
+    startDownloadReadBooks accessToken accessTokenSecret saveBooks saveBookDetails
     Redux.dispatch store (Login (accessToken, accessTokenSecret, userName))
 
 let token = getQueryVariable "oauth_token"

@@ -53,7 +53,7 @@ type BasicStatsTable(props) as this =
                 valueBox  "Slowest book" "bed" (bookDescription stats.SlowestBook) ]
 
 [<Pojo>]
-type ReadBooksWrapper= { ReadBooks : ReadBook[] }
+type ReadBooksWrapper= { ReadBooks : ReadBook[]; Details : BookDetail[] }
 
 type BasicStatsSection(props) as this = 
     inherit React.Component<ReadBooksWrapper, obj>(props)
@@ -99,7 +99,7 @@ type TopTenSection(props) as this =
             R.h4 [ ClassName "service-heading" ] [unbox caption]
             R.table [ClassName "table table-hover"] [ R.tbody [] rows]]
 
-    let topTenTable readBooks=
+    let topTenTable readBooks details=
         match readBooks with
         | [||] -> R.div [ ClassName "row text-center"] [ unbox "Building stats..."]
         | readBooks -> 
@@ -120,9 +120,16 @@ type TopTenSection(props) as this =
 
             let booksByAuthors = 
                 readBooks 
-                |> Seq.groupBy (fun b-> b.AuthorName) 
+                |> Seq.groupBy (fun b -> b.AuthorName) 
                 |> Seq.sortByDescending (fun (key, values)-> values |> Seq.length) 
                 |> Seq.map (fun (authorName, books) -> ([ unbox authorName], sprintf "%i books" (books |> Seq.length)))
+
+            let booksByShelves = 
+                details
+                |> Seq.collect (fun d -> d.Shelves |> Seq.map (fun s -> (s, d.Id)))
+                |> Seq.groupBy (fun (s, id) -> s)
+                |> Seq.sortByDescending (fun (shelf, ids) -> ids |> Seq.length)
+                |> Seq.map (fun (shelf, ids) -> ([unbox shelf], sprintf "%i books" (ids |> Seq.length)))
 
             R.div [] [
                 R.div [ ClassName "row text-center" ] [
@@ -132,7 +139,7 @@ type TopTenSection(props) as this =
                 R.div [ ClassName "row text-center" ] [
                         table (booksByLength |> List.rev |> Seq.truncate 10)  "Shortest books*"
                         table (booksByAuthors |> Seq.truncate 10)  "Top authors*"
-                        table []  "Top genres*"]
+                        table (booksByShelves |> Seq.truncate 10)  "Top genres*"]
                 R.div [ ClassName "row text-center" ] [
                         table []  "Top shelves*"
                         table []  "Top period*"
@@ -145,4 +152,4 @@ type TopTenSection(props) as this =
                 R.div [ClassName "row"] [
                     R.div [ClassName "col-lg-12 text-center"] [
                         R.h2 [ClassName "section-heading"] [ unbox "TOP 10"] ] ]
-                topTenTable this.props.ReadBooks ] ]
+                topTenTable this.props.ReadBooks this.props.Details ] ]
