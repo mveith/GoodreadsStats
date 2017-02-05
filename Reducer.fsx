@@ -20,6 +20,7 @@ let saveReadBooks actualState books =
 
 let saveBooksDetails actualState details =
     let mergedDetails = merge (fun d -> d.Id) [ actualState.BooksDetails ; details]
+    ReadBooksStorage.saveDetails mergedDetails 
     { actualState with BooksDetails = mergedDetails }
 
 let reducer (state: State) = function

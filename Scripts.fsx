@@ -33,8 +33,14 @@ let loadSavedBooks() =
     match savedBooks with
     | Some savedBooks -> savedBooks
     | None -> [||]
+    
+let loadDetails() = 
+    let savedDetails = ReadBooksStorage.loadDetails() 
+    match savedDetails with
+    | Some savedDetails -> savedDetails
+    | None -> [||]
 
-let store = Redux.createStore reducer {Logged = false; ReadBooks = loadSavedBooks(); AccessData = None; LoggedUserName = ""; BooksDetails = [||] }
+let store = Redux.createStore reducer {Logged = false; ReadBooks = loadSavedBooks(); AccessData = None; LoggedUserName = ""; BooksDetails = loadDetails() }
 
 ReactDom.render(
     R.com<App,_,_> { Store=store } [],

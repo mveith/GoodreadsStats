@@ -10,3 +10,10 @@ let load() : ReadBook[] option =
     
 let save (data: ReadBook[]) =
     Browser.localStorage.setItem(key, Fable.Core.JsInterop.toJson data)
+
+let detailsKey = "details"
+let loadDetails() : BookDetail[] option =
+    Browser.localStorage.getItem(detailsKey) |> unbox |> Fable.Core.JsInterop.ofJson
+    
+let saveDetails (data: BookDetail[]) =
+    Browser.localStorage.setItem(detailsKey, Fable.Core.JsInterop.toJson data)
