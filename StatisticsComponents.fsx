@@ -124,9 +124,9 @@ type TopTenSection(props) as this =
                 |> Seq.sortByDescending (fun (key, values)-> values |> Seq.length) 
                 |> Seq.map (fun (authorName, books) -> ([ unbox authorName], sprintf "%i books" (books |> Seq.length)))
 
-            let booksByShelves = 
+            let booksByGenres = 
                 details
-                |> Seq.collect (fun d -> d.Shelves |> Seq.map (fun s -> (s, d.Id)))
+                |> Seq.collect (fun d -> d.Genres |> Seq.map (fun s -> (s, d.Id)))
                 |> Seq.groupBy (fun (s, id) -> s)
                 |> Seq.sortByDescending (fun (shelf, ids) -> ids |> Seq.length)
                 |> Seq.map (fun (shelf, ids) -> ([unbox shelf], sprintf "%i books" (ids |> Seq.length)))
@@ -139,7 +139,7 @@ type TopTenSection(props) as this =
                 R.div [ ClassName "row text-center" ] [
                         table (booksByLength |> List.rev |> Seq.truncate 10)  "Shortest books*"
                         table (booksByAuthors |> Seq.truncate 10)  "Top authors*"
-                        table (booksByShelves |> Seq.truncate 10)  "Top genres*"]
+                        table (booksByGenres |> Seq.truncate 10)  "Top genres*"]
                 R.div [ ClassName "row text-center" ] [
                         table []  "Top shelves*"
                         table []  "Top period*"

@@ -13,7 +13,7 @@ type ReadBook =
 
 type BookDetail =
     { Id : int
-      Shelves : string[] }
+      Genres : string[] }
 
 type BookStatsData = 
     { Book : ReadBook
