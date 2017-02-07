@@ -1,6 +1,7 @@
 #r "node_modules/fable-core/Fable.Core.dll"
 #r "node_modules/fable-react/Fable.React.dll"
 #load "BasicStatsCalculator.fsx"
+#load "TopTables.fsx"
 
 open Model
 open Fable.Core.JsInterop
@@ -9,6 +10,7 @@ module R = Fable.Helpers.React
 open R.Props
 open BasicStatsCalculator
 open Fable.Core
+open TopTables
 
 [<Pojo>]
 type BasicStatsTableProps = { BasicStats :BasicStats }
@@ -75,19 +77,16 @@ type BasicStatsSection(props) as this =
                         R.h3 [ClassName "section-subheading text-muted"] [ unbox "Basic statistics for read books."] ] ]
                 statsTable this.props.ReadBooks ]]
 
+[<Pojo>]
+type TopTenSectionState = { SelectedKey : string }
+
+type TopDescription = { Key : string; TableFactory : (ReadBook[] * BookDetail[]) -> React.ReactElement; Title : string }
+
 type TopTenSection(props) as this = 
-    inherit React.Component<ReadBooksWrapper, obj>(props)
-    do base.setInitState ([])
+    inherit React.Component<ReadBooksWrapper, TopTenSectionState>(props)
+    do base.setInitState ({ SelectedKey =  "Fastest"})
 
-    let getBookContent book=
-        [
-            R.b [] [unbox book.BookTitle]
-            R.br [] []
-            R.i [] [ unbox "by" ]
-            R.br [] []
-            R.span [] [ unbox book.AuthorName ]]
-
-    let table rows caption=
+    let table rows=
         let createRow rank rowContent value =
             R.tr [][
                     R.td [][ unbox rank]
@@ -95,61 +94,41 @@ type TopTenSection(props) as this =
                     R.td [][ unbox value]]
 
         let rows = rows |> Seq.mapi (fun index (rowContent, value)-> createRow (index + 1) rowContent value) |> Seq.toList
-        R.div [ ClassName "col-md-4" ] [            
-            R.h4 [ ClassName "service-heading" ] [unbox caption]
-            R.table [ClassName "table table-hover"] [ R.tbody [] rows]]
+        R.table [ClassName "table table-hover"] [ R.tbody [] rows]
 
-    let topTenTable readBooks details=
-        match readBooks with
-        | [||] -> R.div [ ClassName "row text-center"] [ unbox "Building stats..."]
-        | readBooks -> 
-            let validBooks = validBooks readBooks
-            let booksSpeed = booksSpeed validBooks
+    let tops = 
+        [
+            { Key = "Fastest"; Title = "Fastest books"; TableFactory = booksBySpeed >> Seq.truncate 10 >> table }            
+            { Key = "Slowest"; Title = "Slowest books"; TableFactory = booksBySpeed >> List.rev >> Seq.truncate 10 >> table }            
+            { Key = "Longest"; Title = "Longest books*"; TableFactory = booksByLength >> Seq.truncate 10 >> table }
+            { Key = "Shortest"; Title = "Shortest books*"; TableFactory = booksByLength >> List.rev >> Seq.truncate 10 >> table }
+            { Key = "Authors"; Title = "Top authors*"; TableFactory = booksByAuthors >> Seq.truncate 10 >> table }
+            { Key = "Genres"; Title = "Top genres*"; TableFactory = booksByGenres >> Seq.truncate 10 >> table }
+            { Key = "Shelves"; Title = "Top shelves*"; TableFactory = fun p -> table [] }
+            { Key = "Periods"; Title = "Top periods*"; TableFactory = fun p -> table [] }
+            { Key = "Language"; Title = "Top original language*"; TableFactory = fun p -> table [] }
+        ]
 
-            let booksBySpeed= 
-                booksSpeed 
-                |> Seq.map (fun b -> (getBookContent b.Book, sprintf "%.2f pages / day" b.Speed)) 
-                |> Seq.toList
+    let selectTop t = this.setState({ SelectedKey = t.Key })
 
-            let booksByLength = 
-                readBooks 
-                |> Seq.filter (fun b -> b.NumPages > 0)
-                |> Seq.sortByDescending (fun b-> b.NumPages) 
-                |> Seq.map (fun b-> (getBookContent b, sprintf "%i pages" b.NumPages)) 
-                |> Seq.toList
-
-            let booksByAuthors = 
-                readBooks 
-                |> Seq.groupBy (fun b -> b.AuthorName) 
-                |> Seq.sortByDescending (fun (key, values)-> values |> Seq.length) 
-                |> Seq.map (fun (authorName, books) -> ([ unbox authorName], sprintf "%i books" (books |> Seq.length)))
-
-            let booksByGenres = 
-                details
-                |> Seq.collect (fun d -> d.Genres |> Seq.map (fun s -> (s, d.Id)))
-                |> Seq.groupBy (fun (s, id) -> s)
-                |> Seq.sortByDescending (fun (shelf, ids) -> ids |> Seq.length)
-                |> Seq.map (fun (shelf, ids) -> ([unbox shelf], sprintf "%i books" (ids |> Seq.length)))
-
-            R.div [] [
-                R.div [ ClassName "row text-center" ] [
-                        table (booksBySpeed |> Seq.truncate 10) "Fastest books"
-                        table (booksBySpeed |> List.rev |> Seq.truncate 10) "Slowest books"
-                        table (booksByLength |> Seq.truncate 10)  "Longest books*"]
-                R.div [ ClassName "row text-center" ] [
-                        table (booksByLength |> List.rev |> Seq.truncate 10)  "Shortest books*"
-                        table (booksByAuthors |> Seq.truncate 10)  "Top authors*"
-                        table (booksByGenres |> Seq.truncate 10)  "Top genres*"]
-                R.div [ ClassName "row text-center" ] [
-                        table []  "Top shelves*"
-                        table []  "Top period*"
-                        table []  "Top original language*"]
-                R.span [] [ R.i [] [ unbox (sprintf "* From all %i read books " readBooks.Length)]]]
+    let topMenuItem t= 
+        let className = if this.state.SelectedKey = t.Key then "active" else ""
+        R.li [ Role "presentation"; OnClick (fun _ -> selectTop t); ClassName className ] [ R.a [] [unbox t.Title] ]
 
     member x.render() =
+        let topMenuItems = tops |> Seq.map topMenuItem |> Seq.toList
+        let selectedTop = tops |> Seq.filter (fun t -> t.Key = this.state.SelectedKey) |> Seq.head
+        let selectedTopTable = selectedTop.TableFactory(this.props.ReadBooks, this.props.Details)
+
         R.section [Id "top-ten"] [
             R.div [ClassName "container"] [
                 R.div [ClassName "row"] [
                     R.div [ClassName "col-lg-12 text-center"] [
                         R.h2 [ClassName "section-heading"] [ unbox "TOP 10"] ] ]
-                topTenTable this.props.ReadBooks this.props.Details ] ]
+                R.div [ ClassName "col-md-3" ] [            
+                    R.ul [ ClassName "nav nav-pills nav-stacked"] topMenuItems
+                    R.br [] []
+                    R.span [] [ R.i [] [ unbox (sprintf "* From all %i read books " this.props.ReadBooks.Length) ]]]
+                R.div [ ClassName "col-md-9" ] [ 
+                    R.h4 [ ClassName "service-heading" ] [unbox selectedTop.Title]
+                    selectedTopTable]]]
