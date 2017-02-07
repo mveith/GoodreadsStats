@@ -1,6 +1,8 @@
-#r "node_modules/fable-core/Fable.Core.dll"
-#r "node_modules/fable-react/Fable.React.dll"
+#r "../node_modules/fable-core/Fable.Core.dll"
+#r "../node_modules/fable-react/Fable.React.dll"
+#load "../Model.fsx"
 #load "BasicStatsCalculator.fsx"
+#load "Periods.fsx"
 
 open Model
 module R = Fable.Helpers.React
@@ -41,39 +43,10 @@ let booksByGenres =
     >> Seq.sortByDescending (fun (shelf, ids) -> ids |> Seq.length)
     >> Seq.map (fun (shelf, ids) -> ([R.span [] [ unbox shelf ]], sprintf "%i books" (ids |> Seq.length)))
 
-let ordinal i=
-    match i % 100 with
-    | 11 | 12 | 13 -> "th"
-    | _ ->
-        match i % 10 with
-        | 1 -> "st"
-        | 2 -> "nd"
-        | 3 -> "rd"
-        | _ -> "th"
-
-let createCentury i = 
-    if i < 0 then 
-        let index = abs i
-        let min = i * 100
-        (sprintf "%i%s century BC" index (ordinal index), min, min + 99)
-    else 
-        let index = i + 1 
-        let min = i * 100 + 1
-        (sprintf "%i%s century" index (ordinal index), min, min + 99)
-
-let createDecade i = 
-    let min = (1900 + (i * 10))
-    let label = sprintf "%is" min
-    (label, min, min + 10)
-
-let centuries = [-30..30] |> Seq.map createCentury |> Seq.toList
-let decades = [0..100] |> Seq.map createDecade |> Seq.toList
-let periods =  centuries @ decades
-
 let yearPeriods year=
     match year with
     | Some year -> 
-        periods 
+        Periods.periods 
         |> Seq.filter (fun (_, min, max) -> min <= year && year <= max) 
         |> Seq.toList
     | None -> []

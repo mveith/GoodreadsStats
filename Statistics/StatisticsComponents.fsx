@@ -1,5 +1,5 @@
-#r "node_modules/fable-core/Fable.Core.dll"
-#r "node_modules/fable-react/Fable.React.dll"
+#r "../node_modules/fable-core/Fable.Core.dll"
+#r "../node_modules/fable-react/Fable.React.dll"
 #load "BasicStatsCalculator.fsx"
 #load "TopTables.fsx"
 

@@ -1,7 +1,7 @@
 ﻿#r "node_modules/fable-react/Fable.React.dll"
 #load "Utils.fsx"
 #load "Fable.Import.Redux.fsx"
-#load "StatisticsComponents.fsx"
+#load "Statistics/StatisticsComponents.fsx"
 #load "Actions.fsx"
 
 open Fable.Import.Global
