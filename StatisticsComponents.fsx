@@ -105,7 +105,7 @@ type TopTenSection(props) as this =
             { Key = "Authors"; Title = "Top authors*"; TableFactory = booksByAuthors >> Seq.truncate 10 >> table }
             { Key = "Genres"; Title = "Top genres*"; TableFactory = booksByGenres >> Seq.truncate 10 >> table }
             { Key = "Shelves"; Title = "Top shelves*"; TableFactory = fun p -> table [] }
-            { Key = "Periods"; Title = "Top periods*"; TableFactory = fun p -> table [] }
+            { Key = "Periods"; Title = "Top periods*"; TableFactory = booksByPeriods >> Seq.truncate 10 >> table }
             { Key = "Language"; Title = "Top original language*"; TableFactory = fun p -> table [] }
         ]
 
