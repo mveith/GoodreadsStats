@@ -5,7 +5,6 @@ let ordinal i =
         | 11 | 12 | 13 -> "th"
         | _ ->
             match i % 10 with
-            | 0 -> ""
             | 1 -> "st"
             | 2 -> "nd"
             | 3 -> "rd"
