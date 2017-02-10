@@ -1,12 +1,10 @@
 ﻿#r "node_modules/fable-core/Fable.Core.dll"
-#r "node_modules/fable-powerpack/Fable.PowerPack.dll"
 #r "node_modules/fable-react/Fable.React.dll"
 #load "Model.fsx"
 #load "Actions.fsx"
 #load "Fable.Import.Global.fsx"
 #load "Utils.fsx"
 #load "Components.fsx"
-#load "ReadBooksStorage.fsx"
 #load "Reducer.fsx"
 #load "ReadBooksDownloader.fsx"
 
@@ -15,10 +13,10 @@ open Fable.Import.Global
 open Components
 open Utils
 open Model
-open ReadBooksStorage
 open Actions
 open Reducer
 open ReadBooksDownloader
+open Fable.Core
 
 module R = Fable.Helpers.React
 
@@ -59,8 +57,8 @@ let secret = Globals.cookies.get ("authorizationTokenSecret")
 match token with
 | Some token -> 
     let url = completeUrlWithToken "authenticate" token secret.Value
-    ajax url (string
-                >> Fable.Core.JsInterop.ofJson
+    fetchAsJson url (
+                JsInterop.ofJson
                 >> saveAccessToken
                 >> (fun userData -> login userData.AccessToken userData.AccessTokenSecret userData.UserName)
                 >> removeTokenFromLocation)

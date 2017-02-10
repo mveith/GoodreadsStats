@@ -1,9 +1,13 @@
 #r "node_modules/fable-core/Fable.Core.dll"
+#r "node_modules/fable-powerpack/Fable.PowerPack.dll"
+
 #load "Fable.Import.Global.fsx"
 
-open Fable.Import
 open Fable.Import.Browser
 open Fable.Import.Global
+open Fable.PowerPack
+open Fable.PowerPack.Fetch
+
 
 let serverUrl = "https://goodreadsstatsbackend.azurewebsites.net/api/"
 let completeUrl methodName = serverUrl + methodName
@@ -36,3 +40,6 @@ let navigateTo url = window.location.href <- url
 let removeTokenFromLocation() =
     let currentState = window.history.state
     window.history.replaceState(currentState, "", window.location.origin)
+
+let fetchAsJson url map = 
+    fetchAs<string> url [] |> Promise.map map |> ignore

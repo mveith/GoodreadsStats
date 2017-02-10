@@ -108,11 +108,9 @@ type App(props) as this =
         setCookie "authorizationTokenSecret" authData.TokenSecret 1
         authData.Url
 
-    let login()= 
-        ajax (completeUrlWithClientUrl "authorizationUrl") (string
-                                           >> Fable.Core.JsInterop.ofJson
-                                           >> saveAndReturnAuthorizationUrl
-                                           >> navigateTo)
+    let login() = 
+        let url = completeUrlWithClientUrl "authorizationUrl"
+        fetchAsJson url (JsInterop.ofJson >> saveAndReturnAuthorizationUrl >> navigateTo)
     let logout()= 
         removeCookie "accessToken"
         removeCookie "accessTokenSecret"
