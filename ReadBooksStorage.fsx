@@ -10,6 +10,9 @@ let load() : ReadBook[] option =
     
 let save (data: ReadBook[]) =
     Browser.localStorage.setItem(key, Fable.Core.JsInterop.toJson data)
+    
+let clearReadBooks() =
+    Browser.localStorage.removeItem key
 
 let detailsKey = "details"
 let loadDetails() : BookDetail[] option =
@@ -17,3 +20,6 @@ let loadDetails() : BookDetail[] option =
     
 let saveDetails (data: BookDetail[]) =
     Browser.localStorage.setItem(detailsKey, Fable.Core.JsInterop.toJson data)
+
+let clearDetails() =
+    Browser.localStorage.removeItem detailsKey

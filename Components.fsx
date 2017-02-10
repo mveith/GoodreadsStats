@@ -3,6 +3,7 @@
 #load "Fable.Import.Redux.fsx"
 #load "Statistics/StatisticsComponents.fsx"
 #load "Actions.fsx"
+#load "ReadBooksStorage.fsx"
 
 open Fable.Import.Global
 open Actions
@@ -13,6 +14,7 @@ open Fable.Import
 module R = Fable.Helpers.React
 open R.Props
 open StatisticsComponents
+open ReadBooksStorage
 
 type Footer(props) as this = 
     inherit React.Component<obj, obj>(props)
@@ -115,8 +117,8 @@ type App(props) as this =
         removeCookie "accessToken"
         removeCookie "accessTokenSecret"
         removeCookie "userName"
-        Browser.localStorage.removeItem "readBooks"
-        Browser.localStorage.removeItem "details"
+        clearReadBooks()
+        clearDetails()
         navigateTo "/"
         
     member x.render() =
