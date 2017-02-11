@@ -14,7 +14,8 @@ type ReadBook =
 type BookDetail =
     { Id : int
       Genres : string[]
-      OriginalPublicationYear : int option }
+      OriginalPublicationYear : int option 
+      Language : string option }
 
 type BookStatsData = 
     { Book : ReadBook

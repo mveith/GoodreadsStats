@@ -57,3 +57,10 @@ let booksByPeriods =
     >> Seq.groupBy (fun (p, d) -> p)
     >> Seq.sortByDescending (fun (period, details) -> details |> Seq.length)
     >> Seq.map (fun ((label,_,_), details) -> ([R.span [] [ unbox label ]], sprintf "%i books" (details |> Seq.length)))
+
+let booksByLanguages =
+    details 
+    >> Seq.filter (fun d -> Option.isSome d.Language)
+    >> Seq.groupBy (fun d -> Option.get d.Language)
+    >> Seq.sortByDescending (fun (lang, details) -> details |> Seq.length)
+    >> Seq.map (fun (lang, details) -> ([R.span [] [ unbox lang ]], sprintf "%i books" (details |> Seq.length)))
