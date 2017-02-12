@@ -9,7 +9,8 @@ type ReadBook =
       NumPages : int
       BookTitle : string
       AuthorName : string
-      ReviewId : int }
+      ReviewId : int
+      Shelves : string[] }
 
 type BookDetail =
     { Id : int

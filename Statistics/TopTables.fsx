@@ -64,3 +64,15 @@ let booksByLanguages =
     >> Seq.groupBy (fun d -> Option.get d.Language)
     >> Seq.sortByDescending (fun (lang, details) -> details |> Seq.length)
     >> Seq.map (fun (lang, details) -> ([R.span [] [ unbox lang ]], sprintf "%i books" (details |> Seq.length)))
+    
+let booksByShelves =
+    let shelveBookPairs book =
+        match book.Shelves with
+        | [||] -> Seq.singleton ("no shelf", book)
+        | shelves -> shelves |> Seq.map (fun s -> (s, book))
+    readBooks 
+    >> Seq.collect shelveBookPairs 
+    >> Seq.groupBy (fun (s,b) -> s) 
+    >> Seq.sortByDescending (fun (key, values)-> values |> Seq.length) 
+    >> Seq.map (fun (shelf, books) -> ([ R.span [] [ unbox shelf]], sprintf "%i books" (books |> Seq.length)))
+    >> Seq.toList
