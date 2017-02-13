@@ -9,7 +9,7 @@ open ReadBooksStorage
 let flat key col = 
     col 
     |> Seq.groupBy key
-    |> Seq.map (fun (_, group) -> group |> Seq.last)
+    |> Seq.map (snd >> Seq.last)
 
 let merge key = Array.concat >> flat key >> Seq.toArray
 

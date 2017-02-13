@@ -32,15 +32,15 @@ let booksByLength =
 let booksByAuthors =
     readBooks 
     >> Seq.groupBy (fun b -> b.AuthorName) 
-    >> Seq.sortByDescending (fun (key, values)-> values |> Seq.length) 
+    >> Seq.sortByDescending (snd >> Seq.length) 
     >> Seq.map (fun (authorName, books) -> ([ R.span [] [ unbox authorName]], sprintf "%i books" (books |> Seq.length)))
     >> Seq.toList
 
 let booksByGenres = 
     details
     >> Seq.collect (fun d -> d.Genres |> Seq.map (fun s -> (s, d.Id)))
-    >> Seq.groupBy (fun (s, id) -> s)
-    >> Seq.sortByDescending (fun (shelf, ids) -> ids |> Seq.length)
+    >> Seq.groupBy fst
+    >> Seq.sortByDescending (snd >> Seq.length)
     >> Seq.map (fun (shelf, ids) -> ([R.span [] [ unbox shelf ]], sprintf "%i books" (ids |> Seq.length)))
 
 let yearPeriods year=
@@ -54,8 +54,8 @@ let yearPeriods year=
 let booksByPeriods =
     details 
     >> Seq.collect (fun d -> yearPeriods d.OriginalPublicationYear |> Seq.map (fun p -> (p, d))) 
-    >> Seq.groupBy (fun (p, d) -> p)
-    >> Seq.sortByDescending (fun (period, details) -> details |> Seq.length)
+    >> Seq.groupBy fst
+    >> Seq.sortByDescending (snd >> Seq.length)
     >> Seq.map (fun ((label,_,_), details) -> ([R.span [] [ unbox label ]], sprintf "%i books" (details |> Seq.length)))
 
 let booksByLanguages =
@@ -65,7 +65,7 @@ let booksByLanguages =
         | Some lang -> lang
     details 
     >> Seq.groupBy (fun d -> d.Language)
-    >> Seq.sortByDescending (fun (lang, details) -> details |> Seq.length)
+    >> Seq.sortByDescending (snd >> Seq.length)
     >> Seq.map (fun (lang, details) -> ([R.span [] [ unbox (label lang) ]], sprintf "%i books" (details |> Seq.length)))
     
 let booksByShelves =
@@ -75,7 +75,7 @@ let booksByShelves =
         | shelves -> shelves |> Seq.map (fun s -> (s, book))
     readBooks 
     >> Seq.collect shelveBookPairs 
-    >> Seq.groupBy (fun (s,b) -> s) 
-    >> Seq.sortByDescending (fun (key, values)-> values |> Seq.length) 
+    >> Seq.groupBy fst 
+    >> Seq.sortByDescending (snd >> Seq.length) 
     >> Seq.map (fun (shelf, books) -> ([ R.span [] [ unbox shelf]], sprintf "%i books" (books |> Seq.length)))
     >> Seq.toList

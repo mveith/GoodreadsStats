@@ -32,7 +32,7 @@ let getQueryVariable variable =
     query.Split '&'
     |> Seq.map keyValuePair
     |> Seq.filter (fun (key, _) -> key = variable)
-    |> Seq.map (fun (_, value) -> value)
+    |> Seq.map snd
     |> Seq.tryHead        
 
 let navigateTo url = window.location.href <- url
