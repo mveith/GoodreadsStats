@@ -77,6 +77,7 @@ type Navigation(props) as this =
                 if this.props.Logged then                
                     [ R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]
                       R.li [] [ R.a [ClassName "page-scroll"; Href "#top-ten"] [unbox "Top ten"]]
+                      R.li [] [ R.a [ClassName "page-scroll"; Href "#charts"] [unbox "Charts"]]
                       R.li [] [ R.a [ ClassName "logout-button"; Href "#logout"; OnClick logout] [unbox (this.props.LoggedUserName + " (Logout)")]]]
                 else []
 
@@ -129,6 +130,7 @@ type App(props) as this =
                 [
                     R.com<BasicStatsSection, _, _> readBooksWrapper []
                     R.com<TopTenSection, _, _> readBooksWrapper []
+                    R.com<ChartsSection, _, _> readBooksWrapper []
                 ]
             else []
         R.div [] [

@@ -3,6 +3,8 @@
 #load "BasicStatsCalculator.fsx"
 #load "TopTables.fsx"
 
+#load "../Fable.Import.Chartjs.fsx"
+
 open Model
 open Fable.Core.JsInterop
 open Fable.Import
@@ -11,6 +13,7 @@ open R.Props
 open BasicStatsCalculator
 open Fable.Core
 open TopTables
+open Fable.Import.Chartjs
 
 [<Pojo>]
 type BasicStatsTableProps = { BasicStats :BasicStats }
@@ -132,3 +135,50 @@ type TopTenSection(props) as this =
                 R.div [ ClassName "col-md-9" ] [ 
                     R.h4 [ ClassName "service-heading" ] [unbox selectedTop.Title]
                     selectedTopTable]]]
+
+
+type ChartsSection(props) as this = 
+    inherit React.Component<ReadBooksWrapper, obj>(props)
+    do base.setInitState []
+
+    let renderChart()=
+        let booksByYearOfRead = 
+            this.props.ReadBooks 
+            |> Seq.filter (fun b -> Option.isSome b.ReadData)
+            |> Seq.groupBy (fun b -> (Option.get b.ReadData).ReadAt.Year)
+            |> Seq.map (fun (year, books) -> (year, books |> Seq.length))
+            |> Seq.sortBy fst
+            |> Seq.toArray
+
+        let data = 
+            {
+                Labels =  booksByYearOfRead |> Seq.map (fst >> string) |> Seq.toArray
+                Datasets = 
+                    [| 
+                        { 
+                            Label  = None
+                            Data = booksByYearOfRead |> Seq.map (snd >> unbox) |> Seq.toArray
+                        }|]}
+        
+        let options = 
+            { 
+                Scales = Some { YAxes = [| { Ticks = { BeginAtZero = true } } |]; XAxes = [||] }
+                Legend = Some { Display  = false}
+                Title = None }
+        renderChart { CanvasId= "myChart"; Type = Bar; Data = data; Options = Some options }
+
+    member x.componentDidMount()= renderChart()
+
+    member x.render() =
+        R.section [Id "charts"] [
+            R.div [ClassName "container"] [
+                R.div [ClassName "row"] [
+                    R.div [ClassName "col-lg-12 text-center"] [
+                        R.h2 [ClassName "section-heading"] [ unbox "Charts"] ] ]
+                R.div [ ClassName "col-md-3" ] [            
+                    R.ul [ ClassName "nav nav-pills nav-stacked"] [
+                        R.li [ Role "presentation"; ClassName "active" ] [ R.a [] [unbox "Books count"] ]
+                    ]]
+                R.div [ ClassName "col-md-9" ] [ 
+                    R.h4 [ ClassName "service-heading" ] [unbox "Books count"]
+                    R.canvas [Id "myChart"] [ ]]]]
