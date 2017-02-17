@@ -1,19 +1,22 @@
 #r "../node_modules/fable-core/Fable.Core.dll"
 #r "../node_modules/fable-react/Fable.React.dll"
-#load "BasicStatsCalculator.fsx"
-#load "TopTables.fsx"
 
 #load "../Fable.Import.Chartjs.fsx"
+
+#load "BasicStatsCalculator.fsx"
+#load "TopTables.fsx"
+#load "Charts.fsx"
 
 open Model
 open Fable.Core.JsInterop
 open Fable.Import
+open Fable.Import.Chartjs
 module R = Fable.Helpers.React
 open R.Props
 open BasicStatsCalculator
 open Fable.Core
 open TopTables
-open Fable.Import.Chartjs
+open Charts
 
 [<Pojo>]
 type BasicStatsTableProps = { BasicStats :BasicStats }
@@ -137,48 +140,45 @@ type TopTenSection(props) as this =
                     selectedTopTable]]]
 
 
+[<Pojo>]
+type ChartSectionState = { SelectedKey : string; Chart : RenderedChart option }
+
+type ChartDescription = { Key : string; DataFactory : (ReadBook[] * BookDetail[]) -> ChartData; Title : string }
+
 type ChartsSection(props) as this = 
-    inherit React.Component<ReadBooksWrapper, obj>(props)
-    do base.setInitState []
+    inherit React.Component<ReadBooksWrapper, ChartSectionState>(props)
+    do base.setInitState ({ SelectedKey =  "BooksCount"; Chart = None})
 
-    let renderChart()=
-        let booksByYearOfRead = 
-            this.props.ReadBooks 
-            |> Seq.filter (fun b -> Option.isSome b.ReadData)
-            |> Seq.groupBy (fun b -> (Option.get b.ReadData).ReadAt.Year)
-            |> Seq.map (fun (year, books) -> (year, books |> Seq.length))
-            |> Seq.sortBy fst
-            |> Seq.toArray
+    let charts = 
+        [
+            { Key = "BooksCount"; DataFactory = booksByYearOfRead >> chartData; Title = "Books count"}
+            { Key = "PagesCount"; DataFactory = pagesCountByYearOfRead >> Seq.toList >> chartData; Title = "Pages count"}
+        ]
 
-        let data = 
-            {
-                Labels =  booksByYearOfRead |> Seq.map (fst >> string) |> Seq.toArray
-                Datasets = 
-                    [| 
-                        { 
-                            Label  = None
-                            Data = booksByYearOfRead |> Seq.map (snd >> unbox) |> Seq.toArray
-                        }|]}
-        
-        let options = 
-            { 
-                Scales = Some { YAxes = [| { Ticks = { BeginAtZero = true } } |]; XAxes = [||] }
-                Legend = Some { Display  = false}
-                Title = None }
-        renderChart { CanvasId= "myChart"; Type = Bar; Data = data; Options = Some options }
+    let selectChart ch = 
+        destroyExistingChart this.state.Chart
+        let chart = renderChart (ch.DataFactory (this.props.ReadBooks, this.props.Details)) "myChart"
+        this.setState({ this.state with SelectedKey = ch.Key; Chart = Some chart  })
 
-    member x.componentDidMount()= renderChart()
+    let chartMenuItem ch=
+        let className = if this.state.SelectedKey = ch.Key then "active" else ""
+        R.li [ Role "presentation"; OnClick (fun _ -> selectChart ch); ClassName className ] [ R.a [] [unbox ch.Title] ]
+
+    member x.componentDidMount()= 
+        let selectedChart = charts |> Seq.filter (fun ch -> ch.Key = this.state.SelectedKey) |> Seq.head
+        let chart = renderChart (selectedChart.DataFactory (this.props.ReadBooks, this.props.Details)) "myChart"
+        this.setState({ this.state with Chart = Some chart })
 
     member x.render() =
+        let selectedChart = charts |> Seq.filter (fun ch -> ch.Key = this.state.SelectedKey) |> Seq.head
+        let chartItems = charts |> Seq.map chartMenuItem |> Seq.toList
         R.section [Id "charts"] [
             R.div [ClassName "container"] [
                 R.div [ClassName "row"] [
                     R.div [ClassName "col-lg-12 text-center"] [
                         R.h2 [ClassName "section-heading"] [ unbox "Charts"] ] ]
                 R.div [ ClassName "col-md-3" ] [            
-                    R.ul [ ClassName "nav nav-pills nav-stacked"] [
-                        R.li [ Role "presentation"; ClassName "active" ] [ R.a [] [unbox "Books count"] ]
-                    ]]
+                    R.ul [ ClassName "nav nav-pills nav-stacked"] chartItems]
                 R.div [ ClassName "col-md-9" ] [ 
-                    R.h4 [ ClassName "service-heading" ] [unbox "Books count"]
+                    R.h4 [ ClassName "service-heading" ] [unbox selectedChart.Title]
                     R.canvas [Id "myChart"] [ ]]]]

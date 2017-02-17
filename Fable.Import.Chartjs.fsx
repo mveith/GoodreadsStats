@@ -110,7 +110,13 @@ let private convertType = function
     | Bubble -> "bubble"
 
 [<Global>]
-type private Chart(ctx:Browser.HTMLElement, settings:obj) = class end
+type private Chart(ctx:Browser.HTMLElement, settings:obj) =
+    member x.destroy () = failwith "JS only"
+
+type RenderedChart =
+    {
+        Destroy : unit -> unit
+    }
 
 let renderChart chart=
     let ctx = Browser.document.getElementById chart.CanvasId
@@ -121,4 +127,4 @@ let renderChart chart=
             "data"==> createData chart.Data 
             "options" ==>  (chart.Options |> Option.map createOptions) ]
     let chart = new Chart(ctx, settings)
-    ()
+    { Destroy = chart.destroy }
