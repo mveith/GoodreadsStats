@@ -1,8 +1,10 @@
 #load "../Model.fsx"
 #load "../Fable.Import.Chartjs.fsx"
+#load "BasicStatsCalculator.fsx"
 
 open Model
 open Fable.Import.Chartjs
+open BasicStatsCalculator
 
 let readBooks ((readBooks, details) : ReadBook[] * BookDetail[]) = readBooks
 
@@ -29,6 +31,14 @@ let newAuthorsByYears =
     >> Seq.map (fun (authorName, books) -> (authorName, books |> Seq.map (fun b -> b.ReadData.Value.ReadAt.Year) |> Seq.sort |> Seq.head))
     >> Seq.groupBy snd
     >> Seq.map (fun (y, authors) -> (string y, authors |> Seq.length))
+    >> Seq.sortBy fst
+    >> Seq.toList
+
+let averageSpeedByYears =
+    readBooks 
+    >> validBooks
+    >> Seq.groupBy (fun b -> (Option.get b.ReadData).ReadAt.Year)
+    >> Seq.map (fun (year, books) -> (string year, System.Math.Round(averageSpeed books, 2)))
     >> Seq.sortBy fst
     >> Seq.toList
 

@@ -154,6 +154,7 @@ type ChartsSection(props) as this =
             { Key = "BooksCount"; DataFactory = booksByYearOfRead >> chartData; Title = "Books count"}
             { Key = "PagesCount"; DataFactory = pagesCountByYearOfRead >> Seq.toList >> chartData; Title = "Pages count"}
             { Key = "NewAuthors"; DataFactory = newAuthorsByYears >> chartData; Title = "New authors"}
+            { Key = "AverageSpeed"; DataFactory = averageSpeedByYears >> chartData; Title = "Average speed"}
         ]
 
     let selectChart ch = 
