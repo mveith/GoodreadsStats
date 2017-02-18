@@ -143,7 +143,7 @@ type TopTenSection(props) as this =
 [<Pojo>]
 type ChartSectionState = { SelectedKey : string; Chart : RenderedChart option }
 
-type ChartDescription = { Key : string; DataFactory : (ReadBook[] * BookDetail[]) -> ChartData; Title : string }
+type ChartDescription = { Key : string; DataFactory : (ReadBook[] * BookDetail[]) -> ChartData; Title : string; Type : ChartType }
 
 type ChartsSection(props) as this = 
     inherit React.Component<ReadBooksWrapper, ChartSectionState>(props)
@@ -151,15 +151,15 @@ type ChartsSection(props) as this =
 
     let charts = 
         [
-            { Key = "BooksCount"; DataFactory = booksByYearOfRead >> chartData; Title = "Books count"}
-            { Key = "PagesCount"; DataFactory = pagesCountByYearOfRead >> Seq.toList >> chartData; Title = "Pages count"}
-            { Key = "NewAuthors"; DataFactory = newAuthorsByYears >> chartData; Title = "New authors"}
-            { Key = "AverageSpeed"; DataFactory = averageSpeedByYears >> chartData; Title = "Average speed"}
+            { Key = "BooksCount"; DataFactory = booksByYearOfRead >> chartData; Title = "Books count"; Type = Bar}
+            { Key = "PagesCount"; DataFactory = pagesCountByYearOfRead >> Seq.toList >> chartData; Title = "Pages count"; Type = Bar}
+            { Key = "NewAuthors"; DataFactory = newAuthorsByYears >> chartData; Title = "New authors"; Type = Bar}
+            { Key = "AverageSpeed"; DataFactory = averageSpeedByYears >> chartData; Title = "Average speed"; Type = Line}
         ]
 
     let selectChart ch = 
         destroyExistingChart this.state.Chart
-        let chart = renderChart (ch.DataFactory (this.props.ReadBooks, this.props.Details)) "myChart"
+        let chart = renderChart (ch.DataFactory (this.props.ReadBooks, this.props.Details)) "myChart" ch.Type
         this.setState({ this.state with SelectedKey = ch.Key; Chart = Some chart  })
 
     let chartMenuItem ch=
@@ -168,7 +168,7 @@ type ChartsSection(props) as this =
 
     member x.componentDidMount()= 
         let selectedChart = charts |> Seq.filter (fun ch -> ch.Key = this.state.SelectedKey) |> Seq.head
-        let chart = renderChart (selectedChart.DataFactory (this.props.ReadBooks, this.props.Details)) "myChart"
+        let chart = renderChart (selectedChart.DataFactory (this.props.ReadBooks, this.props.Details)) "myChart" selectedChart.Type
         this.setState({ this.state with Chart = Some chart })
 
     member x.render() =

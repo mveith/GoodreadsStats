@@ -52,13 +52,13 @@ let chartData (data: (string * 'b) list)=
                         Data = data |> Seq.map (snd >> unbox) |> Seq.toArray
                     }|]}
 
-let renderChart data canvasId =
+let renderChart data canvasId chartType =
     let options = 
         { 
-            Scales = Some { YAxes = [| { Ticks = { BeginAtZero = true } } |]; XAxes = [||] }
+            Scales = None
             Legend = Some { Display  = false}
             Title = None }
-    renderChart { CanvasId = canvasId; Type = Bar; Data = data; Options = Some options }
+    renderChart { CanvasId = canvasId; Type = chartType; Data = data; Options = Some options }
 
 let destroyExistingChart chart =
     match chart with
