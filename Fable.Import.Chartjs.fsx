@@ -27,8 +27,17 @@ type ChartScales =
         XAxes : ChartAxis array 
     } 
 
+type LegendPosition=
+    | Top
+    | Left
+    | Bottom
+    | Right
+
 type ChartLegend=
-    { Display : bool}
+    { 
+        Position : LegendPosition option
+        FullWidth : bool option
+    }
 
 type ChartOptions =
     { 
@@ -54,8 +63,13 @@ type ChartInfo =
         Data : ChartData
         CanvasId : string 
     }
-
-    
+ 
+let private append (fields: (string*obj) list) key o map =
+    match o with
+    | Some v -> 
+        (key ==> (map v)) :: fields
+    | None -> fields
+   
 let private createDataset (dataset: ChartDataset)=
     createObj [
         "label" ==> dataset.Label
@@ -72,19 +86,25 @@ let private createAxis a =
             createObj [
                 "beginAtZero" ==> a.Ticks.BeginAtZero]]
 
-let private append (fields: (string*obj) list) key o map =
-    match o with
-    | Some v -> 
-        (key ==> (map v)) :: fields
-    | None -> fields
-
 let private createScales scales=
     createObj [
         "yAxes" ==> (scales.YAxes |> Seq.map createAxis |> Seq.toArray)
         "xAxes" ==> (scales.XAxes |> Seq.map createAxis |> Seq.toArray)]
 
+let private createLegendPosition = function
+    | Top -> "top"
+    | Left -> "left"
+    | Bottom -> "bottom"
+    | Right -> "right"
+
 let private createLegend legend=
-    createObj ["display" ==> legend.Display]
+    match legend with
+    | Some legend -> 
+        let fields = ["display" ==> true]
+        let fields = append fields "fullWidth" legend.FullWidth id
+        let fields = append fields "position" legend.Position createLegendPosition
+        createObj fields
+    | None -> createObj ["display" ==> false]
 
 let private createTitle title=
     match title with
@@ -94,7 +114,7 @@ let private createTitle title=
 let private createOptions o =
     let fields =  []
     let fields = append fields "scales" o.Scales createScales
-    let fields = append fields "legend" o.Legend createLegend
+    let fields = ("legend"==> createLegend o.Legend) :: fields
     let fields = ("title" ==> createTitle o.Title) :: fields
 
     createObj fields

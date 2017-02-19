@@ -65,11 +65,11 @@ let chartData (data: (string * 'b) list)=
                         Data = data |> Seq.map (snd >> unbox) |> Seq.toArray
                     }|]}
 
-let renderChart data canvasId chartType =
+let renderChart data canvasId chartType legend=
     let options = 
         { 
             Scales = None
-            Legend = Some { Display  = false}
+            Legend = legend
             Title = None }
     renderChart { CanvasId = canvasId; Type = chartType; Data = data; Options = Some options }
 
