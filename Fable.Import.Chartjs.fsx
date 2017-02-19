@@ -1,19 +1,10 @@
 #r "node_modules/fable-core/Fable.Core.dll"
 
+#load "Colors.fsx"
+
 open Fable.Core
 open Fable.Core.JsInterop
-
-type ChartDataset =
-    { 
-        Label :string option
-        Data : seq<obj> 
-    }
-    
-type ChartData =
-    { 
-        Labels : string[]
-        Datasets : ChartDataset array
-    }
+open Colors
 
 type ChartTicks =
     { BeginAtZero : bool }
@@ -46,19 +37,60 @@ type ChartOptions =
         Legend : ChartLegend option
     }
 
-type ChartType=
-    | Bar
-    | HorizontalBar
-    | Line
-    | Radar
-    | PolarArea
-    | Pie
-    | Doughnut
-    | Bubble
+type GenericDataset =
+    { 
+        Label :string option
+        Data : seq<obj> 
+    }
+
+type CubicInterpolationMode =
+    | Default
+    | Monotone    
+
+type LineDataset =
+    { 
+        Label :string option
+        Data : seq<obj> 
+        Fill : bool
+        InterpolationMode : CubicInterpolationMode
+    }
+    
+type BarDataset=
+    {
+        Label :string option
+        Data : seq<obj> 
+        BackgroundColor : Color array option
+        BorderColor : Color array option
+        BorderWidth : int option
+    }
+
+type PieDataset=
+    {
+        Label :string option
+        Data : seq<obj> 
+        BackgroundColor : Color array option
+        BorderColor : Color array option
+        BorderWidth : int option
+    }
+
+type ChartDataWrapper<'a> =
+    { 
+        Labels : string[]
+        Datasets : 'a array
+    }
+
+type ChartData =
+    | Bar of ChartDataWrapper<BarDataset>
+    | HorizontalBar of ChartDataWrapper<BarDataset>
+    | Line of ChartDataWrapper<LineDataset>
+    | Radar of ChartDataWrapper<GenericDataset>
+    | PolarArea of ChartDataWrapper<GenericDataset>
+    | Pie of ChartDataWrapper<PieDataset>
+    | Doughnut of ChartDataWrapper<GenericDataset>
+    | Bubble of ChartDataWrapper<GenericDataset>
 
 type ChartInfo =
     { 
-        Type : ChartType
         Options : ChartOptions option
         Data : ChartData
         CanvasId : string 
@@ -70,15 +102,63 @@ let private append (fields: (string*obj) list) key o map =
         (key ==> (map v)) :: fields
     | None -> fields
    
-let private createDataset (dataset: ChartDataset)=
+let private createGenericDataset (dataset:GenericDataset)=
     createObj [
         "label" ==> dataset.Label
         "data"==> (dataset.Data  |> Seq.toArray) ]
+   
+let private cubicinterpolationMode = function
+    | Default -> "default"
+    | Monotone -> "monotone"
+   
+let private createLineDataset (dataset:LineDataset)=
+    createObj [
+        "label" ==> dataset.Label
+        "data"==> (dataset.Data  |> Seq.toArray)
+        "fill" ==> dataset.Fill
+        "cubicInterpolationMode" ==> cubicinterpolationMode dataset.InterpolationMode ]
+   
+let rgba color =
+    sprintf "rgba(%i,%i,%i,%f)" (int color.R) (int color.G) (int color.B) color.A
+
+let colorArray =
+    Seq.map rgba >> Seq.toArray
+let private createBarDataset (dataset:BarDataset)=
+    let fields = [
+        "label" ==> dataset.Label
+        "data"==> (dataset.Data  |> Seq.toArray) ]
+    let fields = append fields "backgroundColor" dataset.BackgroundColor colorArray
+    let fields = append fields "borderColor" dataset.BorderColor colorArray
+    let fields = append fields "borderWidth" dataset.BorderWidth id
+    createObj fields
+    
+let private createPieDataset (dataset:PieDataset)=
+    let fields = [
+        "label" ==> dataset.Label
+        "data"==> (dataset.Data  |> Seq.toArray) ]
+    let fields = append fields "backgroundColor" dataset.BackgroundColor colorArray
+    let fields = append fields "borderColor" dataset.BorderColor colorArray
+    let fields = append fields "borderWidth" dataset.BorderWidth id
+    createObj fields
+   
+let private chartDataFields data createDataset=    
+        [
+            "labels" ==> data.Labels
+            "datasets"==> (data.Datasets |> Seq.map createDataset |> Seq.toArray)
+        ]
 
 let private createData data =
-    createObj [
-        "labels" ==> data.Labels
-        "datasets"==> (data.Datasets |> Seq.map createDataset |> Seq.toArray)]
+    let dataObjectFields = 
+        match data with
+        | Line data -> chartDataFields data createLineDataset
+        | Bar data 
+        | HorizontalBar data  -> chartDataFields data createBarDataset
+        | Pie data -> chartDataFields data createPieDataset
+        | Radar data
+        | PolarArea data
+        | Doughnut data
+        | Bubble data -> chartDataFields data createGenericDataset
+    createObj dataObjectFields
         
 let private createAxis a = 
     createObj [
@@ -120,14 +200,14 @@ let private createOptions o =
     createObj fields
 
 let private convertType = function
-    | Line -> "line"
-    | Bar -> "bar"
-    | HorizontalBar -> "horizontalBar"
-    | Radar -> "radar"
-    | PolarArea -> "polarArea"
-    | Pie -> "pie"
-    | Doughnut -> "doughnut"
-    | Bubble -> "bubble"
+    | Line _-> "line"
+    | Bar _-> "bar"
+    | HorizontalBar _ -> "horizontalBar"
+    | Radar _ -> "radar"
+    | PolarArea _ -> "polarArea"
+    | Pie _ -> "pie"
+    | Doughnut _ -> "doughnut"
+    | Bubble _ -> "bubble"
 
 [<Global>]
 type private Chart(ctx:Browser.HTMLElement, settings:obj) =
@@ -143,7 +223,7 @@ let renderChart chart=
 
     let settings = 
         createObj [
-            "type" ==> convertType chart.Type
+            "type" ==> convertType chart.Data
             "data"==> createData chart.Data 
             "options" ==>  (chart.Options |> Option.map createOptions) ]
     let chart = new Chart(ctx, settings)

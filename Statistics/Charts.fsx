@@ -1,10 +1,12 @@
 #load "../Model.fsx"
 #load "../Fable.Import.Chartjs.fsx"
 #load "BasicStatsCalculator.fsx"
+#load "../Colors.fsx"
 
 open Model
 open Fable.Import.Chartjs
 open BasicStatsCalculator
+open Colors
 
 let readBooks ((readBooks, details) : ReadBook[] * BookDetail[]) = readBooks
 let details ((readBooks, details) : ReadBook[] * BookDetail[]) = details
@@ -55,23 +57,60 @@ let booksByShelves =
     >> Seq.map (fun (shelf, books) -> (shelf, (books |> Seq.length)))
     >> Seq.toList
 
-let chartData (data: (string * 'b) list)=
-        {
+let random()= 
+    let random = new System.Random()
+    random.Next()
+
+let randomColors length=
+    Colors.colors |> Seq.sortBy (fun _ -> random()) |> Seq.take length
+
+let barChartData (data: (string * 'b) list)=
+    let colors = randomColors (data |> Seq.length) |> Seq.toArray
+    Bar {
+        Labels =  data |> Seq.map (fst >> string) |> Seq.toArray
+        Datasets = 
+            [| 
+                { 
+                    Label  = None
+                    Data = data |> Seq.map (snd >> unbox) |> Seq.toArray
+                    BackgroundColor = colors |> Seq.map (fun c -> { c with A = 0.5 }) |> Seq.toArray |> Some
+                    BorderColor = colors |> Seq.toArray |> Some
+                    BorderWidth = Some 1
+                }|]}
+
+let lineChartData (data: (string * 'b) list)=
+        Line {
             Labels =  data |> Seq.map (fst >> string) |> Seq.toArray
             Datasets = 
                 [| 
                     { 
                         Label  = None
                         Data = data |> Seq.map (snd >> unbox) |> Seq.toArray
+                        Fill = false
+                        InterpolationMode = Monotone
                     }|]}
 
-let renderChart data canvasId chartType legend=
+let pieChartData (data: (string * 'b) list)=
+    let colors = randomColors (data |> Seq.length) |> Seq.toArray
+    Pie {
+        Labels =  data |> Seq.map (fst >> string) |> Seq.toArray
+        Datasets = 
+            [| 
+                { 
+                    Label  = None
+                    Data = data |> Seq.map (snd >> unbox) |> Seq.toArray
+                    BackgroundColor = colors |> Seq.map (fun c -> { c with A = 0.5 }) |> Seq.toArray |> Some
+                    BorderColor = colors |> Seq.toArray |> Some
+                    BorderWidth = Some 1
+                }|]}
+
+let renderChart data canvasId legend=
     let options = 
         { 
             Scales = None
             Legend = legend
             Title = None }
-    renderChart { CanvasId = canvasId; Type = chartType; Data = data; Options = Some options }
+    renderChart { CanvasId = canvasId; Data = data; Options = Some options }
 
 let destroyExistingChart chart =
     match chart with
