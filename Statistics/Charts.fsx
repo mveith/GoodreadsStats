@@ -7,6 +7,7 @@ open Fable.Import.Chartjs
 open BasicStatsCalculator
 
 let readBooks ((readBooks, details) : ReadBook[] * BookDetail[]) = readBooks
+let details ((readBooks, details) : ReadBook[] * BookDetail[]) = details
 
 let booksByYearOfRead = 
     readBooks
@@ -40,6 +41,18 @@ let averageSpeedByYears =
     >> Seq.groupBy (fun b -> (Option.get b.ReadData).ReadAt.Year)
     >> Seq.map (fun (year, books) -> (string year, System.Math.Round(averageSpeed books, 2)))
     >> Seq.sortBy fst
+    >> Seq.toList
+
+let booksByShelves =
+    let shelveBookPairs book =
+        match book.Shelves with
+        | [||] -> Seq.singleton ("no shelf", book)
+        | shelves -> shelves |> Seq.map (fun s -> (s, book))
+    readBooks 
+    >> Seq.collect shelveBookPairs 
+    >> Seq.groupBy fst 
+    >> Seq.sortByDescending (snd >> Seq.length) 
+    >> Seq.map (fun (shelf, books) -> (shelf, (books |> Seq.length)))
     >> Seq.toList
 
 let chartData (data: (string * 'b) list)=

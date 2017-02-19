@@ -110,7 +110,7 @@ type TopTenSection(props) as this =
             { Key = "Shortest"; Title = "Shortest books*"; TableFactory = booksByLength >> List.rev >> Seq.truncate 10 >> table }
             { Key = "Authors"; Title = "Top authors*"; TableFactory = booksByAuthors >> Seq.truncate 10 >> table }
             { Key = "Genres"; Title = "Top genres*"; TableFactory = booksByGenres >> Seq.truncate 10 >> table }
-            { Key = "Shelves"; Title = "Top shelves*"; TableFactory = booksByShelves >> Seq.truncate 10 >> table }
+            { Key = "Shelves"; Title = "Top shelves*"; TableFactory = TopTables.booksByShelves >> Seq.truncate 10 >> table }
             { Key = "Periods"; Title = "Top periods*"; TableFactory = booksByPeriods >> Seq.truncate 10 >> table }
             { Key = "Language"; Title = "Top language*"; TableFactory = booksByLanguages >> Seq.truncate 10 >> table }
         ]
@@ -155,6 +155,7 @@ type ChartsSection(props) as this =
             { Key = "PagesCount"; DataFactory = pagesCountByYearOfRead >> Seq.toList >> chartData; Title = "Pages count"; Type = Bar}
             { Key = "NewAuthors"; DataFactory = newAuthorsByYears >> chartData; Title = "New authors"; Type = Bar}
             { Key = "AverageSpeed"; DataFactory = averageSpeedByYears >> chartData; Title = "Average speed"; Type = Line}
+            { Key = "Shelves"; DataFactory = booksByShelves >> chartData; Title = "Shelves"; Type = Pie}
         ]
 
     let selectChart ch = 
