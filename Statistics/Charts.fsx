@@ -122,14 +122,15 @@ let pieChartData (data: (string * 'b) list)=
                     BorderWidth = Some 1
                 }|]}
 
-let beginAtZero= function
-    | Line _ -> false
-    | _ -> true
+let scales = function
+    | Line _ -> Some { XAxes = [||]; YAxes = [| {Ticks = { BeginAtZero = false }} |]}
+    | Bar _ -> Some { XAxes = [||]; YAxes = [| {Ticks = { BeginAtZero = true }} |]}
+    | _ -> None
 
 let renderChart data canvasId legend =
     let options = 
         { 
-            Scales = Some { XAxes = [||]; YAxes = [| {Ticks = { BeginAtZero = beginAtZero data }} |]}
+            Scales = scales data
             Legend = legend
             Title = None }
     renderChart { CanvasId = canvasId; Data = data; Options = Some options }
