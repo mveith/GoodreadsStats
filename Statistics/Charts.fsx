@@ -2,6 +2,7 @@
 #load "../Fable.Import.Chartjs.fsx"
 #load "BasicStatsCalculator.fsx"
 #load "../Colors.fsx"
+#load "Periods.fsx"
 
 open Model
 open Fable.Import.Chartjs
@@ -56,6 +57,23 @@ let booksByShelves =
     >> Seq.sortByDescending (snd >> Seq.length) 
     >> Seq.map (fun (shelf, books) -> (shelf, (books |> Seq.length)))
     >> Seq.toList
+
+let yearPeriods year=
+    match year with
+    | Some year -> 
+        Periods.periods 
+        |> Seq.filter (fun (_, min, max) -> min <= year && year <= max) 
+        |> Seq.toList
+    | None -> []
+
+let booksByPeriods =
+    details 
+    >> Seq.collect (fun d -> yearPeriods d.OriginalPublicationYear |> Seq.map (fun p -> (p, d))) 
+    >> Seq.groupBy fst
+    >> Seq.sortByDescending (snd >> Seq.length)
+    >> Seq.map (fun ((year,_,_), details) -> (string year, details |> Seq.length))
+    >> Seq.toList
+
 
 let random()= 
     let random = new System.Random()
