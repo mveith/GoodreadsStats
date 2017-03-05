@@ -92,30 +92,80 @@ type Navigation(props) as this =
                 R.div [] [
                     R.ul [ClassName "nav navbar-nav navbar-right"] (menuItems())]]]
 
+[<Pojo>]
+type BookFiltersState = { SelectedYears : int option list }
+
 type AllBooksSection(props) as this=
-    inherit React.Component<ReadBooksWrapper, obj>(props)
-    do this.setInitState([])
+    inherit React.Component<ReadBooksWrapper, BookFiltersState>(props)
+    
+    do this.setInitState({ SelectedYears = []})
+
+    let changeYearSelection year= 
+        let newSelection = 
+            if List.contains year this.state.SelectedYears then
+                this.state.SelectedYears |> List.except [year] 
+            else
+                year :: this.state.SelectedYears
+        this.setState { this.state with SelectedYears = newSelection }
+
+    let year book = book.ReadData |> Option.map (fun rd -> rd.ReadAt.Year)
+
+    let isBookEnabled book =
+        this.state.SelectedYears |> Seq.isEmpty || List.contains (year book) this.state.SelectedYears
+
+    let optionLabel = function 
+        | Some value -> sprintf "%O" value
+        | None -> "Empty"
+
+    let filter onChange value = 
+        R.li [ ClassName "list-group-item"] [ 
+            R.input [
+                Type "checkbox"
+                OnChange (fun _ -> onChange value) ] []
+            unbox (sprintf " %s" (optionLabel value))]
+
+    let filterSection values onChange title= 
+        R.div [] [
+            R.h5 [][unbox title]
+            R.ul [ClassName "list-group"] (values |> Seq.map (filter onChange) |> Seq.toList)]
+
+    let bookImage book = 
+        let className = if not (isBookEnabled book) then "book-image disabled" else "book-image"
+        R.img [
+            Src book.SmallImageUrl
+            Alt book.BookTitle
+            Title book.BookTitle
+            ClassName className ] [] 
+
+    let readDate book = 
+        match book.ReadData with
+        | Some read -> read.ReadAt
+        | None -> System.DateTime.MinValue
+
+    let images =  
+        Seq.sortByDescending readDate
+        >> Seq.map bookImage
+        >> Seq.toList
 
     member x.render()=
-        let bookImage book = R.img [Src book.SmallImageUrl; Alt book.BookTitle; Title book.BookTitle; ClassName "book-image" ] [] 
-        let readDate book = 
-            match book.ReadData with
-            | Some read -> read.ReadAt
-            | None -> System.DateTime.MinValue
-
-        let images = 
-            props.ReadBooks 
-            |> Seq.sortByDescending readDate
-            |> Seq.map bookImage
-            |> Seq.toList
+        let years = 
+            this.props.ReadBooks 
+            |> Seq.map year 
+            |> Seq.groupBy id 
+            |> Seq.map fst 
+            |> Seq.toArray
 
         R.section [Id "books"] [
                 R.div [ClassName "container"] [
                     R.div [ClassName "row"] [
                         R.div [ClassName "col-lg-12 text-center"] [
                             R.h2 [ClassName "section-heading"] [ unbox "Books"] ] ]
-                    R.div [ ClassName "col-md-12" ] [
-                        R.div [] images]]]
+                    R.div [ ClassName "col-md-3" ] [
+                        R.div [] [
+                                R.h4 [] [ unbox "Filters"]
+                                filterSection years changeYearSelection "Year" ]]
+                    R.div [ ClassName "col-md-9" ] [
+                        R.div [] (images this.props.ReadBooks)]]]
 
 [<Pojo>]
 type AppState = {State : State; Dispatch : Action -> unit }
