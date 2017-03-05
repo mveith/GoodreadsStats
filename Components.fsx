@@ -97,10 +97,16 @@ type AllBooksSection(props) as this=
     do this.setInitState([])
 
     member x.render()=
+        let bookImage book = R.img [Src book.SmallImageUrl; Alt book.BookTitle; Title book.BookTitle; ClassName "book-image" ] [] 
+        let readDate book = 
+            match book.ReadData with
+            | Some read -> read.ReadAt
+            | None -> System.DateTime.MinValue
 
         let images = 
             props.ReadBooks 
-            |> Seq.map (fun b -> R.img [Src b.SmallImageUrl; Alt b.BookTitle; Title b.BookTitle; ClassName "book-image" ] [] ) 
+            |> Seq.sortByDescending readDate
+            |> Seq.map bookImage
             |> Seq.toList
 
         R.section [Id "books"] [
