@@ -78,12 +78,12 @@ type Navigation(props) as this =
                     [ R.li [] [ R.a [ClassName "page-scroll"; Href "#basic-stats"] [unbox "Basic statistics"]]
                       R.li [] [ R.a [ClassName "page-scroll"; Href "#top-ten"] [unbox "Top ten"]]
                       R.li [] [ R.a [ClassName "page-scroll"; Href "#charts"] [unbox "Charts"]]
+                      R.li [] [ R.a [ClassName "page-scroll"; Href "#books"] [unbox "Books"]]
                       R.li [] [ R.a [ ClassName "logout-button"; Href "#logout"; OnClick logout] [unbox (this.props.LoggedUserName + " (Logout)")]]]
                 else []
 
             let topButton = R.li [ClassName "hidden"] [ R.a [Href "#page-top"] []]
             topButton :: menuItemsForLoggedUser
-
 
         R.nav [Id "mainNav" ; ClassName "navbar navbar-default navbar-custom navbar-fixed-top affix-top"] [
             R.div [ClassName "container"] [
@@ -91,6 +91,25 @@ type Navigation(props) as this =
                     R.a [ClassName "navbar-brand page-scroll"; Href "#page-top"] [unbox "Goodreads Statistics"]]
                 R.div [] [
                     R.ul [ClassName "nav navbar-nav navbar-right"] (menuItems())]]]
+
+type AllBooksSection(props) as this=
+    inherit React.Component<ReadBooksWrapper, obj>(props)
+    do this.setInitState([])
+
+    member x.render()=
+
+        let images = 
+            props.ReadBooks 
+            |> Seq.map (fun b -> R.img [Src b.SmallImageUrl; Alt b.BookTitle; Title b.BookTitle; ClassName "book-image" ] [] ) 
+            |> Seq.toList
+
+        R.section [Id "books"] [
+                R.div [ClassName "container"] [
+                    R.div [ClassName "row"] [
+                        R.div [ClassName "col-lg-12 text-center"] [
+                            R.h2 [ClassName "section-heading"] [ unbox "Books"] ] ]
+                    R.div [ ClassName "col-md-12" ] [
+                        R.div [] images]]]
 
 [<Pojo>]
 type AppState = {State : State; Dispatch : Action -> unit }
@@ -131,6 +150,7 @@ type App(props) as this =
                     R.com<BasicStatsSection, _, _> readBooksWrapper []
                     R.com<TopTenSection, _, _> readBooksWrapper []
                     R.com<ChartsSection, _, _> readBooksWrapper []
+                    R.com<AllBooksSection, _, _> readBooksWrapper []
                 ]
             else []
         R.div [] [

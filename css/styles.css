@@ -14,3 +14,7 @@
 .nav-pills>li>a:hover {
     color: #333;
 }
+
+.book-image {
+    margin: 1px;
+}
