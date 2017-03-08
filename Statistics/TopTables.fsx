@@ -2,7 +2,7 @@
 #r "../node_modules/fable-react/Fable.React.dll"
 #load "../Model.fsx"
 #load "BasicStatsCalculator.fsx"
-#load "Periods.fsx"
+#load "../Periods.fsx"
 
 open Model
 module R = Fable.Helpers.React

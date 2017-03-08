@@ -2,7 +2,7 @@
 #load "../Fable.Import.Chartjs.fsx"
 #load "BasicStatsCalculator.fsx"
 #load "../Colors.fsx"
-#load "Periods.fsx"
+#load "../Periods.fsx"
 
 open Model
 open Fable.Import.Chartjs

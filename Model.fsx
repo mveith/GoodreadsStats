@@ -11,7 +11,8 @@ type ReadBook =
       AuthorName : string
       ReviewId : int
       Shelves : string[]
-      SmallImageUrl : string }
+      SmallImageUrl : string
+      BookId : int }
 
 type BookDetail =
     { Id : int
