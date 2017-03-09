@@ -22,3 +22,8 @@
 .disabled {
     opacity: 0.3;
 }
+
+.filter-label {
+    margin-left: .5em;
+    font-weight: normal;
+}

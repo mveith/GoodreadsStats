@@ -142,11 +142,13 @@ type AllBooksSection(props) as this=
         | None -> "Empty"
 
     let filter valueTitle onChange value = 
+        let id = System.Guid.NewGuid().ToString()
         R.li [ ClassName "list-group-item"] [ 
             R.input [
+                Id id
                 Type "checkbox"
                 OnChange (fun _ -> onChange value) ] []
-            unbox (sprintf " %s" (valueTitle value))]
+            R.label [ HtmlFor id; ClassName "filter-label"] [ unbox (sprintf "%s" (valueTitle value)) ]]
 
     let filterSection values onChange title valueTitle= 
         R.div [] [
