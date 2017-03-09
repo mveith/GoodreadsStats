@@ -134,7 +134,7 @@ type AllBooksSection(props) as this=
 
         filterSatisfied this.state.SelectedYears (year book) && 
         filterSatisfied this.state.SelectedLanguages detail.Language &&
-        ((periods |> Seq.exists (fun period -> filterSatisfied this.state.SelectedPeriods period))|| periods |> Seq.isEmpty)
+        ((periods |> Seq.exists (fun period -> filterSatisfied this.state.SelectedPeriods period)) || (periods |> Seq.isEmpty && this.state.SelectedPeriods |> Seq.isEmpty))
 
 
     let optionLabel = function 
