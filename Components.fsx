@@ -231,17 +231,22 @@ type App(props) as this =
         setCookie "authorizationTokenSecret" authData.TokenSecret 1
         authData.Url
 
-    let login() = 
-        let url = completeUrlWithClientUrl "authorizationUrl"
-        fetchAsJson url (JsInterop.ofJson >> saveAndReturnAuthorizationUrl >> navigateTo)
-    let logout()= 
+    let clearData()=
         removeCookie "accessToken"
         removeCookie "accessTokenSecret"
         removeCookie "userName"
         clearReadBooks()
         clearDetails()
+
+    let login() = 
+        clearData()
+        let url = completeUrlWithClientUrl "authorizationUrl"
+        fetchAsJson url (JsInterop.ofJson >> saveAndReturnAuthorizationUrl >> navigateTo)
+
+    let logout() =
+        clearData()
         navigateTo "/"
-        
+            
     member x.render() =
         let state = getState().State
         let statsComponents =
