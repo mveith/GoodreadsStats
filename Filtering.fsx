@@ -79,11 +79,11 @@ let periodFilters details=
     |> Seq.filter (fun (l, f) -> f.Books |> Seq.isEmpty |> not)
     |> Seq.toList
 
-let isBookEnabled book actualFilters =
-    match actualFilters with
-    | [] -> true
-    | actualFilters -> 
-        let groupedFilters = actualFilters |> Seq.groupBy (fun f-> f.Category)
+let filterBooks books filters =
+    let books = books |> Seq.map (fun b-> b.BookId) |> Set.ofSeq
+    match filters with
+    | [] -> books 
+    | filters -> 
+        let groupedFilters = filters |> Seq.groupBy (fun f-> f.Category)
         let availableBooksByCategories = groupedFilters |> Seq.map (fun (_, fs) -> fs |> Seq.collect (fun f-> f.Books) |> Set.ofSeq)
-        let availableBooks = availableBooksByCategories |> Seq.skip 1 |> Seq.fold Set.intersect (Seq.head availableBooksByCategories)
-        Set.contains book.BookId availableBooks
+        availableBooksByCategories |> Seq.fold Set.intersect books

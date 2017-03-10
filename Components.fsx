@@ -112,8 +112,8 @@ type AllBooksSection(props) as this=
             R.h5 [][unbox title]
             R.ul [ClassName "list-group"] (values |> Seq.map (fun (t, f)-> filter t f) |> Seq.toList)]
 
-    let bookImage book= 
-        let className = if not (isBookEnabled book this.state.SelectedFilters) then "book-image disabled" else "book-image"
+    let bookImage filteredBooks book= 
+        let className = if not (Set.contains book.BookId filteredBooks) then "book-image disabled" else "book-image"
         R.img [
             Src book.SmallImageUrl
             Alt book.BookTitle
@@ -125,10 +125,12 @@ type AllBooksSection(props) as this=
         | Some read -> read.ReadAt
         | None -> System.DateTime.MinValue
 
-    let images =  
-        Seq.sortByDescending readDate
-        >> Seq.map bookImage
-        >> Seq.toList
+    let images books =
+        let filteredBooks = filterBooks books this.state.SelectedFilters
+        books
+        |> Seq.sortByDescending readDate
+        |> Seq.map (bookImage filteredBooks)
+        |> Seq.toList
 
     member x.render()= 
         R.section [Id "books"] [
