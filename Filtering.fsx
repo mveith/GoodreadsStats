@@ -58,21 +58,25 @@ let languageFilters details=
     |> Seq.map (fun (language, books) -> optionLabel language, { Books =books |> Seq.map (fun d -> d.Id) |> Seq.toList; Category = "Languages"})
     |> Seq.toList
 
-let yearPeriods year=
-    match year with
-    | Some year -> 
-        Periods.periods 
-        |> Seq.filter (fun (_, min, max) -> min <= year && year <= max) 
-        |> Seq.map (fun (label, _, _) -> label)
-        |> Seq.toList
-    | None -> []
+let bookInPeriod book (periodLabel, min, max) = 
+    match book.OriginalPublicationYear with
+    | Some year ->min <= year && year <= max
+    | None -> false
+
+let periodBooks allBooks period=
+    match period with
+    | Some p -> 
+        allBooks |> Seq.filter (fun b-> bookInPeriod b p) |> Seq.toList
+    | None -> allBooks |> Seq.filter (fun b-> Option.isNone b.OriginalPublicationYear) |> Seq.toList
 
 let periodFilters details=
-    details
-    |> Seq.collect (fun d -> yearPeriods d.OriginalPublicationYear |> Seq.map (fun p -> (p, d))) 
-    |> Seq.groupBy fst
-    |> Seq.sortByDescending (snd >> Seq.length)
-    |> Seq.map (fun (periodLabel, books) -> periodLabel, { Books =books |>  Seq.map (fun (_, d) -> d.Id) |> Seq.toList; Category = "Periods"})
+    let periodLabel = function
+        | Some (label, _, _) -> label
+        | None -> "Empty"
+    None :: (Periods.periods |> List.map Some) 
+    |> Seq.rev
+    |> Seq.map (fun p -> periodLabel p, { Books = periodBooks details p |> Seq.map(fun b-> b.Id)  |> Seq.toList; Category = "Periods"})
+    |> Seq.filter (fun (l, f) -> f.Books |> Seq.isEmpty |> not)
     |> Seq.toList
 
 let isBookEnabled book actualFilters =
