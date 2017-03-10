@@ -105,7 +105,16 @@ type AllBooksSection(props) as this=
     let filter title f = 
         let onSelected() = this.setState({this.state with SelectedFilters = f :: this.state.SelectedFilters})
         let onUnselected() = this.setState({this.state with SelectedFilters = List.except [ f ] this.state.SelectedFilters})
-        R.com<FilterItem, _, _> { Title = title; OnSelected =  onSelected; OnUnselected = onUnselected} []
+
+        let props = 
+            {
+                Title = title
+                OnSelected =  onSelected
+                OnUnselected = onUnselected
+                WithFilterBooksCount = filterBooks this.props.ReadBooks (f::this.state.SelectedFilters) |> Seq.length
+                WithoutFilterBooksCount = filterBooks this.props.ReadBooks this.state.SelectedFilters |> Seq.length 
+            }
+        R.com<FilterItem, _, _> props []
     
     let filterSection (values: (string * Filter) list) title = 
         R.div [] [

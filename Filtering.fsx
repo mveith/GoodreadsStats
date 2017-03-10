@@ -15,7 +15,14 @@ type Filter = { Books : int list; Category : string }
 type FilterItemState = { IsSelected : bool }
 
 [<Pojo>]
-type FilterItemProps = { Title : string; OnSelected : unit -> unit; OnUnselected : unit -> unit;  }
+type FilterItemProps = 
+    {
+        Title : string
+        OnSelected : unit -> unit
+        OnUnselected : unit -> unit
+        WithFilterBooksCount : int
+        WithoutFilterBooksCount : int
+    }
 
 type FilterItem(props) as this=
     inherit React.Component<FilterItemProps, FilterItemState>(props)
@@ -32,12 +39,19 @@ type FilterItem(props) as this=
 
     member x.render()=
         let id = System.Guid.NewGuid().ToString()
+        let badgeLabel =
+            if this.props.WithFilterBooksCount > this.props.WithoutFilterBooksCount then
+                 sprintf "+%i" (this.props.WithFilterBooksCount - this.props.WithoutFilterBooksCount)
+            else this.props.WithFilterBooksCount.ToString()
+
+        let badge = if this.state.IsSelected then [] else [unbox badgeLabel]
         R.li [ ClassName "list-group-item"] [ 
             R.input [
                 Id id
                 Type "checkbox"
                 OnChange onChange ] []
-            R.label [ HtmlFor id; ClassName "filter-label"] [ unbox (sprintf "%s" this.props.Title) ]]
+            R.label [ HtmlFor id; ClassName "filter-label"] [ unbox this.props.Title ]
+            R.span [ClassName "badge"] badge]
 
 let optionLabel = function 
     | Some value -> sprintf "%O" value
