@@ -4,7 +4,7 @@
 #load "Statistics/StatisticsComponents.fsx"
 #load "Actions.fsx"
 #load "ReadBooksStorage.fsx"
-#load "Periods.fsx"
+#load "Filtering.fsx"
 
 open Fable.Import.Global
 open Actions
@@ -16,6 +16,7 @@ module R = Fable.Helpers.React
 open R.Props
 open StatisticsComponents
 open ReadBooksStorage
+open Filtering
 
 type Footer(props) as this = 
     inherit React.Component<obj, obj>(props)
@@ -94,76 +95,32 @@ type Navigation(props) as this =
                     R.ul [ClassName "nav navbar-nav navbar-right"] (menuItems())]]]
 
 [<Pojo>]
-type BookFiltersState = { SelectedYears : int option list; SelectedLanguages : string option list; SelectedPeriods : (string * int * int) list }
+type BookFiltersState = { SelectedFilters : Filter list }
 
 type AllBooksSection(props) as this=
     inherit React.Component<ReadBooksWrapper, BookFiltersState>(props)
     
-    do this.setInitState({ SelectedYears = []; SelectedLanguages = []; SelectedPeriods = []})
+    do this.setInitState({ SelectedFilters = [] })
 
-    let newSelection actualSelection item =
-        if List.contains item actualSelection then
-            actualSelection |> List.except [item] 
-        else
-            item :: actualSelection
-
-    let changeYearSelection year= 
-        let newSelection = newSelection this.state.SelectedYears year
-        this.setState { this.state with SelectedYears = newSelection }
-
-    let changeYearSelection year = this.setState { this.state with SelectedYears = newSelection this.state.SelectedYears year }
-
-    let changeLanguageSelection language = this.setState { this.state with SelectedLanguages = newSelection this.state.SelectedLanguages language }
-
-    let changePeriodSelection period = this.setState { this.state with SelectedPeriods = newSelection this.state.SelectedPeriods period }
-
-    let year book = book.ReadData |> Option.map (fun rd -> rd.ReadAt.Year)
-
-    let yearPeriods year=
-        match year with
-        | Some year -> 
-            Periods.periods 
-            |> Seq.filter (fun (_, min, max) -> min <= year && year <= max) 
-            |> Seq.toList
-        | None -> []
-
-    let isBookEnabled (book, detail) =
-        let filterSatisfied selected item = selected |> Seq.isEmpty || List.contains item selected
-
-        let periods = yearPeriods detail.OriginalPublicationYear
-
-        filterSatisfied this.state.SelectedYears (year book) && 
-        filterSatisfied this.state.SelectedLanguages detail.Language &&
-        ((periods |> Seq.exists (fun period -> filterSatisfied this.state.SelectedPeriods period)) || (periods |> Seq.isEmpty && this.state.SelectedPeriods |> Seq.isEmpty))
-
-
-    let optionLabel = function 
-        | Some value -> sprintf "%O" value
-        | None -> "Empty"
-
-    let filter valueTitle onChange value = 
-        let id = System.Guid.NewGuid().ToString()
-        R.li [ ClassName "list-group-item"] [ 
-            R.input [
-                Id id
-                Type "checkbox"
-                OnChange (fun _ -> onChange value) ] []
-            R.label [ HtmlFor id; ClassName "filter-label"] [ unbox (sprintf "%s" (valueTitle value)) ]]
-
-    let filterSection values onChange title valueTitle= 
+    let filter title f = 
+        let onSelected() = this.setState({this.state with SelectedFilters = f :: this.state.SelectedFilters})
+        let onUnselected() = this.setState({this.state with SelectedFilters = List.except [ f ] this.state.SelectedFilters})
+        R.com<FilterItem, _, _> { Title = title; OnSelected =  onSelected; OnUnselected = onUnselected} []
+    
+    let filterSection (values: (string * Filter) list) title = 
         R.div [] [
             R.h5 [][unbox title]
-            R.ul [ClassName "list-group"] (values |> Seq.map (filter valueTitle onChange) |> Seq.toList)]
+            R.ul [ClassName "list-group"] (values |> Seq.map (fun (t, f)-> filter t f) |> Seq.toList)]
 
-    let bookImage (book, detail) = 
-        let className = if not (isBookEnabled (book, detail)) then "book-image disabled" else "book-image"
+    let bookImage book= 
+        let className = if not (isBookEnabled book this.state.SelectedFilters) then "book-image disabled" else "book-image"
         R.img [
             Src book.SmallImageUrl
             Alt book.BookTitle
             Title book.BookTitle
             ClassName className ] [] 
 
-    let readDate (book, detail) = 
+    let readDate book = 
         match book.ReadData with
         | Some read -> read.ReadAt
         | None -> System.DateTime.MinValue
@@ -173,31 +130,7 @@ type AllBooksSection(props) as this=
         >> Seq.map bookImage
         >> Seq.toList
 
-    member x.render()=
-        let years = 
-            this.props.ReadBooks 
-            |> Seq.map year 
-            |> Seq.groupBy id 
-            |> Seq.map fst 
-            |> Seq.toArray
-
-        let languages = 
-            this.props.Details
-            |> Seq.groupBy (fun d -> d.Language)
-            |> Seq.sortByDescending (snd >> Seq.length)
-            |> Seq.map fst
-            |> Seq.toArray
-
-        let periods =
-            this.props.Details
-            |> Seq.collect (fun d -> yearPeriods d.OriginalPublicationYear |> Seq.map (fun p -> (p, d))) 
-            |> Seq.groupBy fst
-            |> Seq.sortByDescending (snd >> Seq.length)
-            |> Seq.map fst
-            |> Seq.toArray
-        
-        let booksAndDetails = this.props.ReadBooks |> Seq.map (fun b -> (b, this.props.Details |> Seq.find (fun d -> d.Id = b.BookId)))
-
+    member x.render()= 
         R.section [Id "books"] [
                 R.div [ClassName "container"] [
                     R.div [ClassName "row"] [
@@ -206,11 +139,11 @@ type AllBooksSection(props) as this=
                     R.div [ ClassName "col-md-3" ] [
                         R.div [] [
                                 R.h4 [] [ unbox "Filters"]
-                                filterSection years changeYearSelection "Year" optionLabel
-                                filterSection languages changeLanguageSelection "Language" optionLabel
-                                filterSection periods changePeriodSelection "Period" (fun (label,_,_) -> label) ]]
+                                filterSection (yearFilters this.props.ReadBooks) "Year"
+                                filterSection (languageFilters this.props.Details) "Language"
+                                filterSection (periodFilters this.props.Details) "Period" ]]
                     R.div [ ClassName "col-md-9" ] [
-                        R.div [] (images booksAndDetails)]]]
+                        R.div [] (images this.props.ReadBooks)]]]
 
 [<Pojo>]
 type AppState = {State : State; Dispatch : Action -> unit }
