@@ -11,48 +11,6 @@ open R.Props
 
 type Filter = { Books : int list; Category : string }
 
-[<Pojo>]
-type FilterItemState = { IsSelected : bool }
-
-[<Pojo>]
-type FilterItemProps = 
-    {
-        Title : string
-        OnSelected : unit -> unit
-        OnUnselected : unit -> unit
-        WithFilterBooksCount : int
-        WithoutFilterBooksCount : int
-    }
-
-type FilterItem(props) as this=
-    inherit React.Component<FilterItemProps, FilterItemState>(props)
-    
-    do this.setInitState({ IsSelected = false })
-
-    let onChange e =
-        if this.state.IsSelected then
-            this.setState { this.state with IsSelected = false}
-            this.props.OnUnselected()
-        else 
-            this.setState { this.state with IsSelected = true}
-            this.props.OnSelected()
-
-    member x.render()=
-        let id = System.Guid.NewGuid().ToString()
-        let badgeLabel =
-            if this.props.WithFilterBooksCount > this.props.WithoutFilterBooksCount then
-                 sprintf "+%i" (this.props.WithFilterBooksCount - this.props.WithoutFilterBooksCount)
-            else this.props.WithFilterBooksCount.ToString()
-
-        let badge = if this.state.IsSelected then [] else [unbox badgeLabel]
-        R.li [ ClassName "list-group-item"] [ 
-            R.input [
-                Id id
-                Type "checkbox"
-                OnChange onChange ] []
-            R.label [ HtmlFor id; ClassName "filter-label"] [ unbox this.props.Title ]
-            R.span [ClassName "badge"] badge]
-
 let optionLabel = function 
     | Some value -> sprintf "%O" value
     | None -> "Empty"
@@ -101,3 +59,86 @@ let filterBooks books filters =
         let groupedFilters = filters |> Seq.groupBy (fun f-> f.Category)
         let availableBooksByCategories = groupedFilters |> Seq.map (fun (_, fs) -> fs |> Seq.collect (fun f-> f.Books) |> Set.ofSeq)
         availableBooksByCategories |> Seq.fold Set.intersect books
+
+[<Pojo>]
+type FilterItemState = { IsSelected : bool }
+
+[<Pojo>]
+type FilterItemProps = 
+    {
+        Title : string
+        OnSelected : unit -> unit
+        OnUnselected : unit -> unit
+        WithFilterBooksCount : int
+        WithoutFilterBooksCount : int
+    }
+
+type FilterItem(props) as this=
+    inherit React.Component<FilterItemProps, FilterItemState>(props)
+    
+    do this.setInitState({ IsSelected = false })
+
+    let onChange e =
+        if this.state.IsSelected then
+            this.setState { this.state with IsSelected = false}
+            this.props.OnUnselected()
+        else 
+            this.setState { this.state with IsSelected = true}
+            this.props.OnSelected()
+
+    member x.render()=
+        let id = System.Guid.NewGuid().ToString()
+        let badgeLabel =
+            if this.props.WithFilterBooksCount > this.props.WithoutFilterBooksCount then
+                 sprintf "+%i" (this.props.WithFilterBooksCount - this.props.WithoutFilterBooksCount)
+            else this.props.WithFilterBooksCount.ToString()
+
+        let badge = if this.state.IsSelected then [] else [unbox badgeLabel]
+        R.li [ ClassName "list-group-item"] [ 
+            R.input [
+                Id id
+                Type "checkbox"
+                OnChange onChange ] []
+            R.label [ HtmlFor id; ClassName "filter-label"] [ unbox this.props.Title ]
+            R.span [ClassName "badge"] badge]
+
+[<Pojo>]
+type FilterSectionState = { AllItemsVisible : bool }
+
+[<Pojo>]
+type FilterSectionProps = 
+    {
+        ActualFilters : unit -> Filter list
+        OnFilterSelected : Filter -> unit
+        OnFilterUnselected : Filter -> unit
+        ReadBooks : seq<ReadBook>
+        Values : (string * Filter) list
+        Title : string
+    }
+
+type FilterSection(props) as this=
+    inherit React.Component<FilterSectionProps, FilterSectionState>(props)
+    
+    do this.setInitState({ AllItemsVisible = false })
+
+    let filter title f = 
+        let actualFilters = this.props.ActualFilters()
+        let props = 
+            {
+                Title = title
+                OnSelected =  fun _ -> this.props.OnFilterSelected f
+                OnUnselected = fun _ -> this.props.OnFilterUnselected f
+                WithFilterBooksCount = filterBooks this.props.ReadBooks (f::actualFilters) |> Seq.length
+                WithoutFilterBooksCount = filterBooks this.props.ReadBooks actualFilters |> Seq.length 
+            }
+        R.com<FilterItem, _, _> props []
+    
+    member x.render()=
+        let items = 
+            this.props.Values 
+            |> Seq.map (fun (t, f)-> filter t f) 
+            |> Seq.toList
+
+        R.div [] [
+            R.h5 [][unbox this.props.Title]
+            R.ul [ClassName "list-group"] (items)]

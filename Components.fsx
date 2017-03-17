@@ -102,24 +102,18 @@ type AllBooksSection(props) as this=
     
     do this.setInitState({ SelectedFilters = [] })
 
-    let filter title f = 
-        let onSelected() = this.setState({this.state with SelectedFilters = f :: this.state.SelectedFilters})
-        let onUnselected() = this.setState({this.state with SelectedFilters = List.except [ f ] this.state.SelectedFilters})
-
+    let filterSection (values: (string * Filter) list) title = 
         let props = 
             {
-                Title = title
-                OnSelected =  onSelected
-                OnUnselected = onUnselected
-                WithFilterBooksCount = filterBooks this.props.ReadBooks (f::this.state.SelectedFilters) |> Seq.length
-                WithoutFilterBooksCount = filterBooks this.props.ReadBooks this.state.SelectedFilters |> Seq.length 
+                ActualFilters  = fun _ -> this.state.SelectedFilters
+                OnFilterSelected = fun f -> this.setState({this.state with SelectedFilters = f :: this.state.SelectedFilters})
+                OnFilterUnselected = fun f -> this.setState({this.state with SelectedFilters = List.except [ f ] this.state.SelectedFilters})
+                ReadBooks = this.props.ReadBooks
+                Values = values 
+                Title  = title
             }
-        R.com<FilterItem, _, _> props []
-    
-    let filterSection (values: (string * Filter) list) title = 
-        R.div [] [
-            R.h5 [][unbox title]
-            R.ul [ClassName "list-group"] (values |> Seq.map (fun (t, f)-> filter t f) |> Seq.toList)]
+
+        R.com<FilterSection, _, _> props []
 
     let bookImage filteredBooks book= 
         let className = if not (Set.contains book.BookId filteredBooks) then "book-image disabled" else "book-image"
