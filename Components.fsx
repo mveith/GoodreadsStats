@@ -146,7 +146,8 @@ type AllBooksSection(props) as this=
                                 R.h4 [] [ unbox "Filters"]
                                 filterSection (yearFilters this.props.ReadBooks) "Year"
                                 filterSection (languageFilters this.props.Details) "Language"
-                                filterSection (periodFilters this.props.Details) "Period" ]]
+                                filterSection (periodFilters this.props.Details) "Period"
+                                filterSection (genreFilters this.props.Details) "Genre" ]]
                     R.div [ ClassName "col-md-9" ] [
                         R.div [] (images this.props.ReadBooks)]]]
 

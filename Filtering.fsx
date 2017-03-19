@@ -51,6 +51,19 @@ let periodFilters details=
     |> Seq.filter (fun (l, f) -> f.Books |> Seq.isEmpty |> not)
     |> Seq.toList
 
+let genreAndBookTuples detail=
+    match detail.Genres with
+    | [||] -> [ (None, detail.Id) ]
+    | genres -> genres |> Seq.map (fun g -> (Some g, detail.Id)) |> Seq.toList
+
+let genreFilters details= 
+    details
+    |> Seq.collect genreAndBookTuples
+    |> Seq.groupBy fst
+    |> Seq.sortByDescending (snd >> Seq.length)
+    |> Seq.map (fun (genre, books) -> optionLabel genre, { Books = books |> Seq.map snd |> Seq.toList; Category = "Genres"})
+    |> Seq.toList
+
 let filterBooks books filters =
     let books = books |> Seq.map (fun b-> b.BookId) |> Set.ofSeq
     match filters with
