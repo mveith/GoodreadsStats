@@ -61,9 +61,6 @@ let filterBooks books filters =
         availableBooksByCategories |> Seq.fold Set.intersect books
 
 [<Pojo>]
-type FilterItemState = { IsSelected : bool }
-
-[<Pojo>]
 type FilterItemProps = 
     {
         Title : string
@@ -71,19 +68,18 @@ type FilterItemProps =
         OnUnselected : unit -> unit
         WithFilterBooksCount : int
         WithoutFilterBooksCount : int
+        IsSelected : bool
     }
 
 type FilterItem(props) as this=
-    inherit React.Component<FilterItemProps, FilterItemState>(props)
+    inherit React.Component<FilterItemProps, obj>(props)
     
-    do this.setInitState({ IsSelected = false })
+    do this.setInitState([])
 
     let onChange e =
-        if this.state.IsSelected then
-            this.setState { this.state with IsSelected = false}
+        if this.props.IsSelected then
             this.props.OnUnselected()
         else 
-            this.setState { this.state with IsSelected = true}
             this.props.OnSelected()
 
     member x.render()=
@@ -93,12 +89,13 @@ type FilterItem(props) as this=
                  sprintf "+%i" (this.props.WithFilterBooksCount - this.props.WithoutFilterBooksCount)
             else this.props.WithFilterBooksCount.ToString()
 
-        let badge = if this.state.IsSelected then [] else [unbox badgeLabel]
+        let badge = if this.props.IsSelected then [] else [unbox badgeLabel]
         R.li [ ClassName "list-group-item"] [ 
             R.input [
                 Id id
                 Type "checkbox"
-                OnChange onChange ] []
+                OnChange onChange 
+                Checked this.props.IsSelected] []
             R.label [ HtmlFor id; ClassName "filter-label"] [ unbox this.props.Title ]
             R.span [ClassName "badge"] badge]
 
@@ -121,24 +118,50 @@ type FilterSection(props) as this=
     
     do this.setInitState({ AllItemsVisible = false })
 
+    let maxVisibleFilterItems = 5
+
     let filter title f = 
         let actualFilters = this.props.ActualFilters()
+
         let props = 
             {
                 Title = title
                 OnSelected =  fun _ -> this.props.OnFilterSelected f
                 OnUnselected = fun _ -> this.props.OnFilterUnselected f
                 WithFilterBooksCount = filterBooks this.props.ReadBooks (f::actualFilters) |> Seq.length
-                WithoutFilterBooksCount = filterBooks this.props.ReadBooks actualFilters |> Seq.length 
+                WithoutFilterBooksCount = filterBooks this.props.ReadBooks actualFilters |> Seq.length
+                IsSelected = List.contains f actualFilters
             }
         R.com<FilterItem, _, _> props []
-    
-    member x.render()=
+
+    let visibleItems values actualFilters allItemsVisible=
         let items = 
-            this.props.Values 
-            |> Seq.map (fun (t, f)-> filter t f) 
+            values
+            |> Seq.map (fun (t, f)-> (f, filter t f)) 
             |> Seq.toList
+
+        if allItemsVisible then items |> List.map snd
+        else 
+            let selectedItems = items |> List.filter (fun (f, e) -> List.contains f actualFilters) |> List.map snd
+            let notSelectedItems = items |> List.filter (fun (f, e) -> not (List.contains f actualFilters)) |> List.map snd
+            let notSelectedItemsToShow = notSelectedItems |> Seq.truncate (maxVisibleFilterItems - selectedItems.Length) |> Seq.toList
+            items |> List.map snd |> List.filter (fun el -> (List.contains el selectedItems) || (List.contains el notSelectedItemsToShow))
+
+    member x.render()=
+        let items = visibleItems this.props.Values (this.props.ActualFilters()) this.state.AllItemsVisible
+
+        let changeItemsVisibility _ =
+            this.setState ({ this.state with AllItemsVisible = not this.state.AllItemsVisible})
+
+        let changeItemsVisibilityLink = 
+            let label = if this.state.AllItemsVisible then "Show less" else "Show all"
+            R.li [ ClassName "list-group-item change-visibility-link"; OnClick changeItemsVisibility] [ 
+                R.a [ ] [unbox label]]
+
+        let items = 
+            if this.props.Values.Length > maxVisibleFilterItems then items @ [ changeItemsVisibilityLink ]
+            else items
 
         R.div [] [
             R.h5 [][unbox this.props.Title]
-            R.ul [ClassName "list-group"] (items)]
+            R.ul [ClassName "list-group"] items]

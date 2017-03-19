@@ -23,6 +23,11 @@
     opacity: 0.3;
 }
 
+.change-visibility-link {
+    text-align: center;
+    cursor: pointer;
+}
+
 .filter-label {
     margin-left: .5em;
     font-weight: normal;
