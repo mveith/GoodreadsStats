@@ -103,7 +103,7 @@ type FilterItem(props) as this=
             else this.props.WithFilterBooksCount.ToString()
 
         let badge = if this.props.IsSelected then [] else [unbox badgeLabel]
-        R.li [ ClassName "list-group-item"] [ 
+        R.li [ ClassName "list-group-item no-wrap"] [ 
             R.input [
                 Id id
                 Type "checkbox"

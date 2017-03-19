@@ -141,7 +141,7 @@ type AllBooksSection(props) as this=
                     R.div [ClassName "row"] [
                         R.div [ClassName "col-lg-12 text-center"] [
                             R.h2 [ClassName "section-heading"] [ unbox "Books"] ] ]
-                    R.div [ ClassName "col-md-3" ] [
+                    R.div [ ClassName "col-md-3  hidden-xs  hidden-sm" ] [
                         R.div [] [
                                 R.h4 [] [ unbox "Filters"]
                                 filterSection (yearFilters this.props.ReadBooks) "Year"

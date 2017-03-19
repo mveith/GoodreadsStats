@@ -32,3 +32,8 @@
     margin-left: .5em;
     font-weight: normal;
 }
+
+.no-wrap {
+    white-space: nowrap;
+    overflow: hidden;
+}
