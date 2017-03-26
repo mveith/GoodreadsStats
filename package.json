@@ -3,30 +3,30 @@
     "name": "GoodreadsStats",
     "version": "1.0.0",
     "description": "",
-    "main": "scripts.js",
+    "main": "app/app.js",
     "scripts": {
         "build": "fable",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
     "author": "",
-    "license": "ISC",
+    "license": "GPL-3.0",
     "dependencies": {
         "core-js": "^2.4.1",
-        "fable-core": "^0.7.14",
+        "fable-core": "^0.7.29",
         "requirejs": "^2.3.2",
-        "react": "15.3.2",
-        "react-dom": "15.3.2",
+        "react": "^15.4.2",
+        "react-dom": "^15.4.2",
         "redux": "^3.6.0",
         "bootstrap": "^3.3.7",
         "font-awesome": "^4.7.0",
-        "fable-powerpack": "^0.0.18",
+        "fable-powerpack": "^0.0.20",
         "chart.js": "^2.5.0"
     },
     "devDependencies": {
         "babel-plugin-transform-runtime": "^6.6.0",
-        "fable-react": "^0.7.11",
-        "fable-compiler": "0.7.25"
+        "fable-react": "^0.8.5",
+        "fable-compiler": "^0.7.50"
     },
     "engines": {
         "fable": "^0.7.17"
