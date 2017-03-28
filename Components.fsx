@@ -18,6 +18,11 @@ open StatisticsComponents
 open ReadBooksStorage
 open Filtering
 
+[<KeyValueList>]
+type HtmlPropExtensions=
+        | [<CompiledName("data-target")>] DataTarget of string            
+        interface IHTMLProp
+
 type Footer(props) as this = 
     inherit React.Component<obj, obj>(props)
     do base.setInitState []
@@ -90,8 +95,11 @@ type Navigation(props) as this =
         R.nav [Id "mainNav" ; ClassName "navbar navbar-default navbar-custom navbar-fixed-top affix-top"] [
             R.div [ClassName "container"] [
                 R.div [ClassName "navbar-header page-scroll"] [
+                    R.button [ClassName "navbar-toggle"; DataToggle "collapse"; DataTarget "#bs-navbar-collapse"] [
+                        R.span [ClassName "sr-only"] [ unbox "Toggle navigation"]
+                        R.i [ClassName "fa fa-bars"] []]
                     R.a [ClassName "navbar-brand page-scroll"; Href "#page-top"] [unbox "Goodreads Statistics"]]
-                R.div [] [
+                R.div [ClassName "collapse navbar-collapse"; Id "bs-navbar-collapse"] [
                     R.ul [ClassName "nav navbar-nav navbar-right"] (menuItems())]]]
 
 [<Pojo>]
