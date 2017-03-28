@@ -1,5 +1,11 @@
 .logout-button {
-    margin-left: 70px;
+    margin-left: 0px;
+}
+
+@media (min-width: 768px) {
+    .logout-button {
+        margin-left: 70px;
+    }
 }
 
 .nav-pills>li.active>a,
