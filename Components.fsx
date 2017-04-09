@@ -36,8 +36,11 @@ type Footer(props) as this =
                     R.div [ClassName "col-md-6"] [
                             R.ul [ClassName "list-inline social-buttons"] [
                                 R.li [] [
-                                    R.a [ Href "#"] [
-                                        R.i [ ClassName "fa fa-twitter"] []]]]]]]]
+                                    R.a [ Href "https://twitter.com/miroveith"; Target "_blank"] [
+                                        R.i [ ClassName "fa fa-twitter"] []]]
+                                R.li [] [
+                                    R.a [ Href "https://github.com/mveith/GoodreadsStats"; Target "_blank"] [
+                                        R.i [ ClassName "fa fa-github"] []]]]]]]]
 [<Pojo>]
 type HeaderProps = {OnLogin : unit -> unit; Logged:bool }
 
