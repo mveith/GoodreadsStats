@@ -42,7 +42,7 @@ type Footer(props) as this =
                                     R.a [ Href "https://github.com/mveith/GoodreadsStats"; Target "_blank"] [
                                         R.i [ ClassName "fa fa-github"] []]]]]]]]
 [<Pojo>]
-type HeaderProps = {OnLogin : unit -> unit; Logged:bool }
+type HeaderProps = {OnLogin : unit -> unit; Logged:bool; StartDemo : unit -> unit }
 
 type Header(props) as this = 
     inherit React.Component<HeaderProps, obj>(props)
@@ -51,10 +51,18 @@ type Header(props) as this =
     let login event =
         this.props.OnLogin()
 
+    let startDemo event =
+        this.props.StartDemo()
+
     member x.render() =            
         let loginButton =
             if not this.props.Logged then 
-                R.button [ Id "login-button"; ClassName "page-scroll btn btn-xl"; OnClick login ] [unbox "Login"] 
+                R.button [ Id "login-button"; ClassName "btn btn-xl"; OnClick login ] [unbox "Login"] 
+                else unbox " " 
+                
+        let demoButton =
+            if not this.props.Logged then 
+                R.button [ Id "demo-button"; ClassName "btn btn-xl"; OnClick startDemo ] [unbox "Try Demo"] 
                 else unbox " " 
         
         let showStatsButton =
@@ -69,6 +77,7 @@ type Header(props) as this =
                     R.div [ClassName "intro-heading"] [ unbox "Discover bookworm in you."]
                     loginButton
                     unbox " "
+                    demoButton
                     showStatsButton]]]
 
 [<Pojo>]
@@ -193,6 +202,10 @@ type App(props) as this =
         let url = completeUrlWithClientUrl "authorizationUrl"
         fetchAsJson url (JsInterop.ofJson >> saveAndReturnAuthorizationUrl >> navigateTo)
 
+    let startDemo()=
+        clearData()
+        dispatch StartDemo
+
     let logout() =
         clearData()
         navigateTo "/"
@@ -211,7 +224,7 @@ type App(props) as this =
             else []
         R.div [] [
             R.com<Navigation, _, _> {Logged = state.Logged; LoggedUserName = state.LoggedUserName; OnLogout = logout} []
-            R.com<Header, _, _> { OnLogin = login; Logged = state.Logged } []
+            R.com<Header, _, _> { OnLogin = login; Logged = state.Logged; StartDemo = startDemo } []
             R.div [] statsComponents
             R.com<Footer, _, _> [] []
         ]

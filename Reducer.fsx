@@ -1,6 +1,7 @@
 #load "Model.fsx"
 #load "Actions.fsx"
 #load "ReadBooksStorage.fsx"
+#load "DemoDataBuilder.fsx"
 
 open Model
 open Actions
@@ -23,7 +24,17 @@ let saveBooksDetails actualState details =
     ReadBooksStorage.saveDetails mergedDetails 
     { actualState with BooksDetails = mergedDetails }
 
+let startDemo actualState =
+    {
+        actualState with 
+            Logged = true; 
+            LoggedUserName = "Demo user"; 
+            ReadBooks = DemoDataBuilder.readBooks(); 
+            BooksDetails = DemoDataBuilder.bookDetails(); 
+            AccessData = None }
+
 let reducer (state: State) = function
     | Login (token, secret, userName)-> { state with Logged = true; AccessData = Some { accessToken = token; accessTokenSecret = secret  }; LoggedUserName = userName}
     | SaveReadBooks books -> saveReadBooks state books
     | SaveBooksDetails details -> saveBooksDetails state details
+    | StartDemo -> startDemo state

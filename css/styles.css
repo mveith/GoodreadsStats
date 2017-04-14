@@ -43,3 +43,7 @@
     white-space: nowrap;
     overflow: hidden;
 }
+
+.btn-xl {
+    width: 180px;
+}
