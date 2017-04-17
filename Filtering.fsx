@@ -79,8 +79,8 @@ type FilterItemProps =
         Title : string
         OnSelected : unit -> unit
         OnUnselected : unit -> unit
-        WithFilterBooksCount : int
-        WithoutFilterBooksCount : int
+        WithFilterBooksCount : unit -> int
+        WithoutFilterBooksCount : unit -> int
         IsSelected : bool
     }
 
@@ -98,9 +98,11 @@ type FilterItem(props) as this=
     member x.render()=
         let id = System.Guid.NewGuid().ToString()
         let badgeLabel =
-            if this.props.WithFilterBooksCount > this.props.WithoutFilterBooksCount then
-                 sprintf "+%i" (this.props.WithFilterBooksCount - this.props.WithoutFilterBooksCount)
-            else this.props.WithFilterBooksCount.ToString()
+            let withFilter = this.props.WithFilterBooksCount()
+            let withoutFilter = this.props.WithoutFilterBooksCount()
+            if withFilter > withoutFilter then
+                 sprintf "+%i" (withFilter - withoutFilter)
+            else withFilter.ToString()
 
         let badge = if this.props.IsSelected then [] else [unbox badgeLabel]
         R.li [ ClassName "list-group-item no-wrap"] [ 
@@ -141,8 +143,8 @@ type FilterSection(props) as this=
                 Title = title
                 OnSelected =  fun _ -> this.props.OnFilterSelected f
                 OnUnselected = fun _ -> this.props.OnFilterUnselected f
-                WithFilterBooksCount = filterBooks this.props.ReadBooks (f::actualFilters) |> Seq.length
-                WithoutFilterBooksCount = filterBooks this.props.ReadBooks actualFilters |> Seq.length
+                WithFilterBooksCount = fun _ -> filterBooks this.props.ReadBooks (f::actualFilters) |> Seq.length
+                WithoutFilterBooksCount = fun _ -> filterBooks this.props.ReadBooks actualFilters |> Seq.length
                 IsSelected = List.contains f actualFilters
             }
         R.com<FilterItem, _, _> props []
