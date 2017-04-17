@@ -16,11 +16,11 @@ open Fable.PowerPack
 let booksPerPage = 10.0
 
 let downloadReadBooksOnPage accessToken accessTokenSecret (callback: ReadBook[] -> unit) page =
-    let url = completeUrl (sprintf "readBooks?token=%s&tokenSecret=%s&perPage=%i&page=%i" accessToken accessTokenSecret (int booksPerPage) page)
+    let url = completeUrl "readBooks" (sprintf "?token=%s&tokenSecret=%s&perPage=%i&page=%i" accessToken accessTokenSecret (int booksPerPage) page)
     fetchAsJson url (Fable.Core.JsInterop.ofJson >> callback)
 
 let downloadBooksDetailsOnPage accessToken accessTokenSecret (callback: BookDetail[] -> unit) page =
-    let url = completeUrl (sprintf "readBooksDetails?token=%s&tokenSecret=%s&perPage=%i&page=%i" accessToken accessTokenSecret (int booksPerPage) page)
+    let url = completeUrl "readBooksDetails" (sprintf "?token=%s&tokenSecret=%s&perPage=%i&page=%i" accessToken accessTokenSecret (int booksPerPage) page)
     fetchAsJson url (Fable.Core.JsInterop.ofJson >> callback)
  
 let pagesCount booksCount = booksCount / booksPerPage |> System.Math.Ceiling |> int

@@ -8,17 +8,17 @@ open Fable.Import.Global
 open Fable.PowerPack
 open Fable.PowerPack.Fetch
 
-
+let code = "/2TrzMFxBGuQedl8nYG0Q4wWeP3Rw9pg/pUhqqnyPxQ1wnl/ayPHFQ=="
 let serverUrl = "https://goodreadsstatsbackend.azurewebsites.net/api/"
-let completeUrl methodName = serverUrl + methodName
 
+let completeUrl methodName query = serverUrl + methodName + query + (sprintf "&code=%s" code)
 let completeUrlWithToken methodName token tokenSecret = 
     let query = sprintf "?token=%s&tokenSecret=%s" token tokenSecret
-    (completeUrl methodName) + query
+    completeUrl methodName query
 
 let completeUrlWithClientUrl methodName =
     let query = sprintf "?clientSideUrl=%s" window.location.origin
-    (completeUrl methodName) + query
+    completeUrl methodName query
 
 let keyValuePair (var : string) =
     let parts = var.Split '='    
