@@ -21,6 +21,7 @@ let yearFilters books =
     books
     |> Seq.groupBy year
     |> Seq.map (fun (year, books) -> optionLabel year,{ Books = books |> Seq.map (fun b -> b.BookId) |> Seq.toList; Category = "Years"})
+    |> Seq.sortByDescending fst
     |> Seq.toList
 
 let languageFilters details= 
