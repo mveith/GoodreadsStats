@@ -1,4 +1,4 @@
-# Bookworm Statistics
+# [Bookworm Statistics](http://bookworm-stats.mveith.com/)
 
 > Discover bookworm in you.
 
@@ -21,3 +21,6 @@ I wanted to try write client of web application in F#.
 
 ### Azure Functions
 See [GoodreadsStatsFunctions project](https://github.com/mveith/GoodreadsStatsFunctions)
+
+### Tavis CI -> AWS S3
+See [http://bookworm-stats.mveith.com/](http://bookworm-stats.mveith.com/)
