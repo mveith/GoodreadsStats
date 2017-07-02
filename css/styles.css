@@ -47,3 +47,10 @@
 .btn-xl {
     width: 180px;
 }
+
+.intro-description {
+    font-family: "Droid Serif", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 35px;
+    line-height: 40px;
+    margin-bottom: 50px;
+}

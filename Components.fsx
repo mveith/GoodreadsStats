@@ -73,8 +73,9 @@ type Header(props) as this =
         R.header [] [
             R.div [ClassName "container" ] [
                 R.div [ClassName "intro-text"] [
-                    R.div [ClassName "intro-lead-in"][ unbox "Welcome To Goodreads Statistics!"]
+                    R.div [ClassName "intro-lead-in"][ unbox "Welcome To Bookworm Statistics!"]
                     R.div [ClassName "intro-heading"] [ unbox "Discover bookworm in you."]
+                    R.div [ClassName "intro-description"] [ unbox "Based on Goodreads.com profile."]
                     loginButton
                     unbox " "
                     demoButton
@@ -110,7 +111,7 @@ type Navigation(props) as this =
                     R.button [ClassName "navbar-toggle"; DataToggle "collapse"; DataTarget "#bs-navbar-collapse"] [
                         R.span [ClassName "sr-only"] [ unbox "Toggle navigation"]
                         R.i [ClassName "fa fa-bars"] []]
-                    R.a [ClassName "navbar-brand page-scroll"; Href "#page-top"] [unbox "Goodreads Statistics"]]
+                    R.a [ClassName "navbar-brand page-scroll"; Href "#page-top"] [unbox "Bookworm Statistics"]]
                 R.div [ClassName "collapse navbar-collapse"; Id "bs-navbar-collapse"] [
                     R.ul [ClassName "nav navbar-nav navbar-right"] (menuItems())]]]
 

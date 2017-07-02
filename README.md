@@ -1,6 +1,8 @@
-# Goodreads Statistics
+# Bookworm Statistics
 
 > Discover bookworm in you.
+
+Statistics based on Goodreads.com profile.
 
 ## Discover read books:
  - Books count
