@@ -5,16 +5,9 @@ before_script:
  - yarn install
  - dotnet restore
 
-deploy:
-  provider: s3
-  access_key_id: $AWS_ACCESS_KEY_ID
-  secret_access_key: $AWS_SECRET_ACCESS_KEY
-  bucket: $AWS_S3_BUCKET_NAME
-  skip_cleanup: true
-  region: $AWS_S3_BUCKET_REGION
-  local_dir: public
-
 script:
  - cd ./src
  - dotnet fable yarn-run build
  - cd ..
+ - npm install netlify-cli -g
+ - netlify deploy -t $NETLIFY_ACCESS_TOKEN
