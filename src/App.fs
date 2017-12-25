@@ -37,12 +37,12 @@ ReactDom.render(
     Browser.document.getElementById "content"
 ) |> ignore
 
-let saveBooks = SaveReadBooks >> Redux.dispatch store
-let saveBookDetails = SaveBooksDetails >> Redux.dispatch store
+let saveBooks = SaveReadBooks >> store.dispatch
+let saveBookDetails = SaveBooksDetails >> store.dispatch
 
 let login accessToken accessTokenSecret userName =
     startDownloadReadBooks accessToken accessTokenSecret saveBooks saveBookDetails
-    Redux.dispatch store (Login (accessToken, accessTokenSecret, userName))
+    store.dispatch (Login (accessToken, accessTokenSecret, userName))
 
 let token = getQueryVariable "oauth_token"
 let secret = Globals.cookies.get ("authorizationTokenSecret")

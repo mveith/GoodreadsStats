@@ -131,7 +131,7 @@ type AllBooksSection(props) as this=
 
     let bookImage filteredBooks book= 
         let className = if not (Set.contains book.BookId filteredBooks) then "book-image disabled" else "book-image"
-        R.image[ Src book.SmallImageUrl;Alt book.BookTitle;Title book.BookTitle;ClassName className ] [] 
+        R.img [ Src book.SmallImageUrl;Alt book.BookTitle;Title book.BookTitle;ClassName className ]
 
     let readDate book = 
         match book.ReadData with
@@ -168,12 +168,12 @@ type AppProps = { Store: Redux.IStore<State, Action> }
 
 type App(props) as this =
     inherit React.Component<AppProps, AppState>(props)
-    let dispatch = Redux.dispatch this.props.Store
+    let dispatch = this.props.Store.dispatch
 
-    let getState() = { State=Redux.getState this.props.Store; Dispatch=dispatch }
+    let getState() = { State=this.props.Store.getState(); Dispatch=dispatch }
 
     do base.setInitState(getState())
-    do Redux.subscribe this.props.Store (getState >> this.setState)
+    do this.props.Store.subscribe  (getState >> this.setState)
 
     let saveAndReturnAuthorizationUrl (authData: AuthorizationUserData) =
         setCookie "authorizationToken" authData.Token 1
