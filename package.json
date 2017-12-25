@@ -1,34 +1,20 @@
 {
     "private": true,
-    "name": "GoodreadsStats",
-    "version": "1.0.0",
-    "description": "",
-    "main": "app/app.js",
     "scripts": {
-        "build": "fable",
+        "build": "webpack -p",
+        "start": "webpack-dev-server",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "keywords": [],
-    "author": "",
-    "license": "GPL-3.0",
-    "dependencies": {
-        "core-js": "^2.4.1",
-        "fable-core": "^0.7.29",
-        "requirejs": "^2.3.2",
-        "react": "^15.4.2",
-        "react-dom": "^15.4.2",
-        "redux": "^3.6.0",
-        "bootstrap": "^3.3.7",
-        "font-awesome": "^4.7.0",
-        "fable-powerpack": "^0.0.20",
-        "chart.js": "^2.5.0"
-    },
     "devDependencies": {
-        "babel-plugin-transform-runtime": "^6.6.0",
-        "fable-react": "^0.8.5",
-        "fable-compiler": "^0.7.50"
-    },
-    "engines": {
-        "fable": "^0.7.17"
+        "babel-core": "6.26.0",
+        "babel-loader": "7.1.2",
+        "babel-preset-env": "1.6.1",
+        "fable-loader": "1.1.6",
+        "fable-utils": "1.0.6",
+        "webpack": "3.8.1",
+        "webpack-dev-server": "2.9.4",
+        "react": "^16.0.0",
+        "react-dom": "^16.0.0",
+        "redux": "^3.7.2"
     }
 }

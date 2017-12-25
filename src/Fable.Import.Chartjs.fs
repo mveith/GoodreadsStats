@@ -1,6 +1,4 @@
-#r "node_modules/fable-core/Fable.Core.dll"
-
-#load "Colors.fsx"
+module Fable.Import.Chartjs
 
 open Fable.Core
 open Fable.Core.JsInterop

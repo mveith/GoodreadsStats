@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Fable.Import.Global.fs" />
+    <Compile Include="Colors.fs" />
+    <Compile Include="Fable.Import.Chartjs.fs" />
+    <Compile Include="Fable.Import.Redux.fs" />
+    <Compile Include="Model.fs" />
+    <Compile Include="Utils.fs" />
+    <Compile Include="Periods.fs" />
+    <Compile Include="Actions.fs" />
+    <Compile Include="DemoDataBuilder.fs" />
+    <Compile Include="Filtering.fs" />
+    <Compile Include="ReadBooksDownloader.fs" />
+    <Compile Include="ReadBooksStorage.fs" />
+    <Compile Include="Reducer.fs" />
+    <Compile Include="Statistics/BasicStatsCalculator.fs" />
+    <Compile Include="Statistics/Charts.fs" />
+    <Compile Include="Statistics/TopTables.fs" />
+    <Compile Include="Statistics/StatisticsComponents.fs" />
+    <Compile Include="Components.fs" />
+    <Compile Include="App.fs" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>

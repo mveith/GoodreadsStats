@@ -1,8 +1,4 @@
-#load "../Model.fsx"
-#load "../Fable.Import.Chartjs.fsx"
-#load "BasicStatsCalculator.fsx"
-#load "../Colors.fsx"
-#load "../Periods.fsx"
+module Charts 
 
 open Model
 open Fable.Import.Chartjs

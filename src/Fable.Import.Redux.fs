@@ -1,6 +1,4 @@
-﻿#r "node_modules/fable-core/Fable.Core.dll"
-
-#load "Fable.Import.Global.fsx"
+﻿module Fable.Import.Redux
 
 open System
 open Fable.Core

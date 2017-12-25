@@ -1,3 +1,5 @@
+module Colors
+
 type Color=
     {
         R : float

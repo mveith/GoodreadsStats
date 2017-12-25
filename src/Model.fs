@@ -1,4 +1,6 @@
-﻿open System
+﻿module Model
+
+open System
 
 type ReadData=
     { ReadAt : DateTime

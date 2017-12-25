@@ -1,8 +1,6 @@
-#load "Model.fsx"
-#load "Actions.fsx"
-#load "ReadBooksStorage.fsx"
-#load "DemoDataBuilder.fsx"
+module Reducer
 
+open Fable.Import
 open Model
 open Actions
 open ReadBooksStorage

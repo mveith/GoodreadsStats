@@ -1,4 +1,4 @@
-﻿#r "node_modules/fable-core/Fable.Core.dll"
+﻿module Fable.Import.Global
 
 open Fable.Core
 

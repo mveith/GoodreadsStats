@@ -1,12 +1,4 @@
-﻿#r "node_modules/fable-core/Fable.Core.dll"
-#r "node_modules/fable-react/Fable.React.dll"
-#load "Model.fsx"
-#load "Actions.fsx"
-#load "Fable.Import.Global.fsx"
-#load "Utils.fsx"
-#load "Components.fsx"
-#load "Reducer.fsx"
-#load "ReadBooksDownloader.fsx"
+module GoodreadsStats
 
 open Fable.Import
 open Fable.Import.Global

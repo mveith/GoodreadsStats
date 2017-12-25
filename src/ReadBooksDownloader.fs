@@ -1,11 +1,4 @@
-#r "node_modules/fable-powerpack/Fable.PowerPack.dll"
-
-#load "Model.fsx"
-#load "Actions.fsx"
-#load "Utils.fsx"
-#load "Components.fsx"
-#load "Reducer.fsx"
-#load "Fable.Import.Global.fsx"
+module ReadBooksDownloader
 
 open Fable.Import.Global
 open Utils

@@ -1,11 +1,4 @@
-#r "../node_modules/fable-core/Fable.Core.dll"
-#r "../node_modules/fable-react/Fable.React.dll"
-
-#load "../Fable.Import.Chartjs.fsx"
-
-#load "BasicStatsCalculator.fsx"
-#load "TopTables.fsx"
-#load "Charts.fsx"
+module StatisticsComponents
 
 open Model
 open Fable.Core.JsInterop
@@ -36,11 +29,11 @@ type BasicStatsTable(props) as this =
         | Some book ->
             [ 
                 R.span [] [ R.b [] [unbox book.Book.BookTitle ]]
-                R.br [] []
+                R.br []
                 R.i [] [ unbox "by" ]
-                R.br [] []
+                R.br []
                 R.span [] [ unbox book.Book.AuthorName ]
-                R.br [] []
+                R.br []
                 unbox (sprintf "(%.2f pages / day)" (float book.Book.NumPages / float book.DaysCount)) ] 
         | None -> []
 
@@ -133,7 +126,7 @@ type TopTenSection(props) as this =
                         R.h2 [ClassName "section-heading"] [ unbox "TOP 10"] ] ]
                 R.div [ ClassName "col-md-3" ] [            
                     R.ul [ ClassName "nav nav-pills nav-stacked"] topMenuItems
-                    R.br [] []
+                    R.br []
                     R.span [] [ R.i [] [ unbox (sprintf "* From all %i read books " this.props.ReadBooks.Length) ]]]
                 R.div [ ClassName "col-md-9" ] [ 
                     R.h4 [ ClassName "service-heading" ] [unbox selectedTop.Title]

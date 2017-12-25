@@ -1,10 +1,4 @@
-﻿#r "node_modules/fable-react/Fable.React.dll"
-#load "Utils.fsx"
-#load "Fable.Import.Redux.fsx"
-#load "Statistics/StatisticsComponents.fsx"
-#load "Actions.fsx"
-#load "ReadBooksStorage.fsx"
-#load "Filtering.fsx"
+﻿module Components 
 
 open Fable.Import.Global
 open Actions
@@ -18,7 +12,6 @@ open StatisticsComponents
 open ReadBooksStorage
 open Filtering
 
-[<KeyValueList>]
 type HtmlPropExtensions=
         | [<CompiledName("data-target")>] DataTarget of string            
         interface IHTMLProp
@@ -138,11 +131,7 @@ type AllBooksSection(props) as this=
 
     let bookImage filteredBooks book= 
         let className = if not (Set.contains book.BookId filteredBooks) then "book-image disabled" else "book-image"
-        R.img [
-            Src book.SmallImageUrl
-            Alt book.BookTitle
-            Title book.BookTitle
-            ClassName className ] [] 
+        R.image[ Src book.SmallImageUrl;Alt book.BookTitle;Title book.BookTitle;ClassName className ] [] 
 
     let readDate book = 
         match book.ReadData with

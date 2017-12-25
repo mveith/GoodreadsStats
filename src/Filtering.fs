@@ -1,7 +1,4 @@
-#r "node_modules/fable-core/Fable.Core.dll"
-#r "node_modules/fable-react/Fable.React.dll"
-#load "Periods.fsx"
-#load "Model.fsx"
+module Filtering
 
 open Model
 open Fable.Core
@@ -107,11 +104,7 @@ type FilterItem(props) as this=
 
         let badge = if this.props.IsSelected then [] else [unbox badgeLabel]
         R.li [ ClassName "list-group-item no-wrap"] [ 
-            R.input [
-                Id id
-                Type "checkbox"
-                OnChange onChange 
-                Checked this.props.IsSelected] []
+            R.input [ Id id;Type "checkbox";OnChange onChange;Checked this.props.IsSelected]
             R.label [ HtmlFor id; ClassName "filter-label"] [ unbox this.props.Title ]
             R.span [ClassName "badge"] badge]
 

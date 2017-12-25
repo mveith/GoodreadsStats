@@ -1,5 +1,4 @@
-#r "node_modules/fable-core/Fable.Core.dll"
-#load "Model.fsx"
+module ReadBooksStorage
 
 open Fable.Import
 open Model

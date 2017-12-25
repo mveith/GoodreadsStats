@@ -1,4 +1,4 @@
-#load "Model.fsx"
+module Actions
 
 open Model
 

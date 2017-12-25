@@ -1,7 +1,5 @@
 ﻿module BasicStatsCalculator
 
-#load "../Model.fsx"
-
 open Model
 open System
 

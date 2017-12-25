@@ -1,13 +1,9 @@
 language: csharp
+dotnet: 2.0.0
 
 before_script:
- - nvm install 4.4
- - nvm use 4.4 
- - npm install
-
-before_deploy:
- - rm .gitignore
- - rm -rf ./node_modules/fable-compiler
+ - yarn install
+ - dotnet restore
 
 deploy:
   provider: s3
@@ -16,6 +12,9 @@ deploy:
   bucket: $AWS_S3_BUCKET_NAME
   skip_cleanup: true
   region: $AWS_S3_BUCKET_REGION
+  local_dir: public
 
 script:
- - fable ./Scripts.fsx
+ - cd ./src
+ - dotnet fable yarn-run build
+ - cd ..

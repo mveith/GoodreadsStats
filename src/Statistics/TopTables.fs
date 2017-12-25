@@ -1,8 +1,4 @@
-#r "../node_modules/fable-core/Fable.Core.dll"
-#r "../node_modules/fable-react/Fable.React.dll"
-#load "../Model.fsx"
-#load "BasicStatsCalculator.fsx"
-#load "../Periods.fsx"
+module TopTables
 
 open Model
 module R = Fable.Helpers.React
@@ -11,9 +7,9 @@ open BasicStatsCalculator
 let getBookContent book=
     [
         R.b [] [unbox book.BookTitle]
-        R.br [] []
+        R.br []
         R.i [] [ unbox "by" ]
-        R.br [] []
+        R.br []
         R.span [] [ unbox book.AuthorName ]]
 
 let readBooks ((readBooks, details) : ReadBook[] * BookDetail[]) = readBooks

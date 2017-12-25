@@ -1,4 +1,4 @@
-#load "Model.fsx"
+module DemoDataBuilder
 
 open Model
 open System

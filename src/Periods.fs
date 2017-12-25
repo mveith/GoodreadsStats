@@ -1,3 +1,5 @@
+module Periods
+
 let ordinal i =
     if i = 0 then ""
     else 

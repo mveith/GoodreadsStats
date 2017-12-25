@@ -1,7 +1,4 @@
-#r "node_modules/fable-core/Fable.Core.dll"
-#r "node_modules/fable-powerpack/Fable.PowerPack.dll"
-
-#load "Fable.Import.Global.fsx"
+module Utils
 
 open Fable.Import.Browser
 open Fable.Import.Global
