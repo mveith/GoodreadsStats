@@ -9,6 +9,8 @@ open Actions
 open Reducer
 open ReadBooksDownloader
 open Fable.Core
+open Fable.PowerPack.Fetch
+open Fable.PowerPack
 
 module R = Fable.Helpers.React
 
@@ -49,11 +51,11 @@ let secret = Globals.cookies.get ("authorizationTokenSecret")
 match token with
 | Some token -> 
     let url = completeUrlWithToken "authenticate" token secret.Value
-    fetchAsJson url (
-                JsInterop.ofJson
-                >> saveAccessToken
-                >> (fun userData -> login userData.AccessToken userData.AccessTokenSecret userData.UserName)
-                >> removeTokenFromLocation)
+    fetchAs<LoggedUserData> url [] |> Promise.map (
+        saveAccessToken 
+        >> (fun userData -> login userData.AccessToken userData.AccessTokenSecret userData.UserName) 
+        >> removeTokenFromLocation) 
+    |> ignore
 | None -> 
     let token = Globals.cookies.get ("accessToken")
     match token with

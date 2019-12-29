@@ -34,6 +34,6 @@ let startDemo actualState =
 let reducer (state: State) action =
     match action with
     | Login (token, secret, userName)-> { state with Logged = true; AccessData = Some { accessToken = token; accessTokenSecret = secret  }; LoggedUserName = userName}
-    | SaveReadBooks books -> saveReadBooks state books
-    | SaveBooksDetails details -> saveBooksDetails state details
+    | SaveReadBooks books -> saveReadBooks state books.Books
+    | SaveBooksDetails details -> saveBooksDetails state details.Details
     | StartDemo -> startDemo state

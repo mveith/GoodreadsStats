@@ -11,12 +11,14 @@ open R.Props
 open StatisticsComponents
 open ReadBooksStorage
 open Filtering
+open Fable.PowerPack
+open Fable.PowerPack.Fetch
 
 type HtmlPropExtensions=
         | [<CompiledName("data-target")>] DataTarget of string            
         interface IHTMLProp
 
-type Footer(props) as this = 
+type Footer(props) = 
     inherit React.Component<obj, obj>(props)
     do base.setInitState []
 
@@ -190,7 +192,7 @@ type App(props) as this =
     let login() = 
         clearData()
         let url = completeUrlWithClientUrl "authorizationUrl"
-        fetchAsJson url (JsInterop.ofJson >> saveAndReturnAuthorizationUrl >> navigateTo)
+        fetchAs<AuthorizationUserData> url [] |> Promise.map (saveAndReturnAuthorizationUrl >> navigateTo) |> ignore
 
     let startDemo()=
         clearData()
